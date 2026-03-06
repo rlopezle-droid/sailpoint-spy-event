@@ -2,19 +2,19 @@ const Replicate = require("replicate");
 
 const STYLES = {
   james_bond: {
-    prompt: "man img as a James Bond secret agent, elegant black tuxedo with bow tie, holding a Walther PPK pistol, dramatic night cityscape background with blurred neon lights, cinematic movie poster composition, chiaroscuro lighting, deep blue and gold color palette, ultra realistic, 8K photography",
+    prompt: "a photo of a person as a James Bond secret agent, elegant black tuxedo with bow tie, holding a Walther PPK pistol, dramatic night cityscape background with blurred neon lights, cinematic movie poster composition, chiaroscuro lighting, deep blue and gold color palette, ultra realistic, 8K photography",
     negative: "cartoon, anime, deformed, blurry, watermark, sunglasses, hat, mask, bad anatomy, low quality",
   },
   mission_impossible: {
-    prompt: "man img as a Mission Impossible secret agent, black tactical suit with earpiece, standing on a glass skyscraper rooftop at night, city lights below, dramatic clouds, orange and teal cinematic color grading, thriller atmosphere, ultra realistic, 8K photography",
+    prompt: "a photo of a person as a Mission Impossible secret agent, black tactical suit with earpiece, standing on a glass skyscraper rooftop at night, city lights below, dramatic clouds, orange and teal cinematic color grading, thriller atmosphere, ultra realistic, 8K photography",
     negative: "cartoon, anime, deformed, blurry, watermark, helmet, mask, sunglasses, bad anatomy",
   },
   ai_cyber: {
-    prompt: "man img as a futuristic cyberpunk AI agent, sleek holographic bodysuit with electric teal glowing circuit patterns, massive server room background with floating holographic data panels, deep navy and electric teal neon glow, ultra realistic, 8K photography",
+    prompt: "a photo of a person as a futuristic cyberpunk AI agent, sleek holographic bodysuit with electric teal glowing circuit patterns, massive server room background with floating holographic data panels, deep navy and electric teal neon glow, ultra realistic, 8K photography",
     negative: "cartoon, anime, deformed, blurry, watermark, helmet, mask, visor, bad anatomy",
   },
   sailpoint_spy: {
-    prompt: "man img as an elite corporate intelligence agent, sharp tailored navy business suit with subtle earpiece, glowing identity vault access panels and dark city skyline background, teal and navy color scheme, professional cinematic photography, ultra realistic, 8K",
+    prompt: "a photo of a person as an elite corporate intelligence agent, sharp tailored navy business suit with subtle earpiece, glowing identity vault access panels and dark city skyline background, teal and navy color scheme, professional cinematic photography, ultra realistic, 8K",
     negative: "cartoon, anime, deformed, blurry, watermark, sunglasses, casual clothes, bad anatomy",
   },
 };
@@ -54,22 +54,23 @@ export default async function handler(req, res) {
   const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
 
   try {
-    // Single call — FLUX PuLID generates the full spy image preserving the person's face
-    // ~15 seconds, ~$0.02 per image, 2.5M runs on Replicate
-    console.log("Generating with FLUX PuLID...");
-    const output = await runWithRetry(replicate, "bytedance/flux-pulid", {
-      main_face_image: `data:image/jpeg;base64,${imageBase64}`,
-      prompt: s.prompt,
-      negative_prompt: s.negative,
-      num_steps: 20,
-      start_step: 4,        // 4 = best for realistic images (per official docs)
-      guidance: 4,
-      true_cfg: 1,
-      width: 768,
-      height: 1024,
-      output_format: "jpg",
-      output_quality: 95,
-    });
+    console.log("Generating with zsxkib/flux-pulid...");
+    const output = await runWithRetry(replicate,
+      "zsxkib/flux-pulid:8baa7ef2255075b46f4d91cd238c21d31181b3e6a864463f967960bb0112525b",
+      {
+        main_face_image: `data:image/jpeg;base64,${imageBase64}`,
+        prompt: s.prompt,
+        negative_prompt: s.negative,
+        num_steps: 20,
+        start_step: 4,
+        guidance: 4,
+        true_cfg: 1,
+        width: 768,
+        height: 1024,
+        output_format: "jpg",
+        output_quality: 95,
+      }
+    );
 
     const imageUrl = String(Array.isArray(output) ? output[0] : output);
     console.log("Done:", imageUrl);
