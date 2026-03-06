@@ -4,182 +4,158 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Operation: Adaptive Identity — SailPoint</title>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600;700&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --navy:#0A1628; --navy2:#0D1F3C; --teal:#00C4B4; --teal-dark:#009688;
-  --teal-glow:rgba(0,196,180,0.12); --white:#fff; --gray:#8FA3B1;
-  --border:rgba(0,196,180,0.25); --red:#FF3B3B; --gold:#FFD700;
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--navy:#0A1628;--navy2:#0D1F3C;--teal:#00C4B4;--teal-dk:#009688;--teal-gl:rgba(0,196,180,.12);--white:#fff;--gray:#8FA3B1;--border:rgba(0,196,180,.25);--red:#FF3B3B}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
 body{font-family:'Rajdhani',sans-serif;background:var(--navy);color:var(--white);min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,196,180,.016) 2px,rgba(0,196,180,.016) 4px)}
-body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:linear-gradient(rgba(0,196,180,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(0,196,180,.035) 1px,transparent 1px);
-  background-size:44px 44px}
-
-/* CORNERS */
-.corner{position:fixed;width:50px;height:50px;border-color:var(--teal);border-style:solid;opacity:.3;z-index:100;pointer-events:none}
-.tl{top:10px;left:10px;border-width:2px 0 0 2px}
-.tr{top:10px;right:10px;border-width:2px 2px 0 0}
-.bl{bottom:10px;left:10px;border-width:0 0 2px 2px}
-.br{bottom:10px;right:10px;border-width:0 2px 2px 0}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,196,180,.015) 2px,rgba(0,196,180,.015) 4px)}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(0,196,180,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,196,180,.03) 1px,transparent 1px);background-size:44px 44px}
+.corner{position:fixed;width:48px;height:48px;border-color:var(--teal);border-style:solid;opacity:.28;z-index:100;pointer-events:none}
+.c-tl{top:10px;left:10px;border-width:2px 0 0 2px}.c-tr{top:10px;right:10px;border-width:2px 2px 0 0}
+.c-bl{bottom:10px;left:10px;border-width:0 0 2px 2px}.c-br{bottom:10px;right:10px;border-width:0 2px 2px 0}
 
 /* HEADER */
-.header{position:relative;z-index:10;padding:20px 20px 0;text-align:center}
-.classified{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:4px;
-  color:var(--teal);border:1px solid var(--border);padding:4px 14px;margin-bottom:12px;animation:blink 2.5s infinite}
+.header{position:relative;z-index:10;padding:22px 20px 0;text-align:center}
+.classified{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--teal);border:1px solid var(--border);padding:4px 14px;margin-bottom:14px;animation:blink 2.5s infinite}
 @keyframes blink{0%,100%{border-color:rgba(0,196,180,.2)}50%{border-color:rgba(0,196,180,.7)}}
-.logo-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}
-.hex{width:32px;height:32px;background:var(--teal);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);position:relative}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}
+.hex{width:32px;height:32px;background:var(--teal);flex-shrink:0;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);position:relative}
 .hex::after{content:'';position:absolute;inset:4px;background:var(--navy);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)}
-.logo-name{font-family:'Oswald',sans-serif;font-size:20px;font-weight:600;letter-spacing:4px}
-.op-title{font-family:'Oswald',sans-serif;font-size:clamp(22px,7vw,34px);font-weight:700;letter-spacing:2px;line-height:1.1}
+.logo-name{font-family:'Oswald',sans-serif;font-size:21px;font-weight:600;letter-spacing:4px}
+.op-title{font-family:'Oswald',sans-serif;font-size:clamp(24px,7vw,36px);font-weight:700;letter-spacing:2px;line-height:1.1}
 .op-title span{color:var(--teal);display:block}
-.op-sub{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:2px;margin-top:5px}
-.divider{width:70%;max-width:260px;height:1px;background:linear-gradient(90deg,transparent,var(--teal),transparent);margin:14px auto;position:relative;z-index:10}
+.op-sub{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:2px;margin-top:6px}
+.divider{width:70%;max-width:260px;height:1px;background:linear-gradient(90deg,transparent,var(--teal),transparent);margin:16px auto;position:relative;z-index:10}
 
 /* STEPS */
-.steps{display:flex;align-items:center;justify-content:center;padding:0 16px;margin-bottom:20px;position:relative;z-index:10}
-.step{display:flex;flex-direction:column;align-items:center;gap:4px;flex:0 0 auto;opacity:.28;transition:opacity .4s}
+.steps{display:flex;align-items:center;justify-content:center;padding:0 16px;margin-bottom:22px;position:relative;z-index:10}
+.step{display:flex;flex-direction:column;align-items:center;gap:5px;flex:0 0 auto;opacity:.25;transition:opacity .4s}
 .step.active{opacity:1}.step.done{opacity:.5}
-.step-n{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--teal);display:flex;align-items:center;justify-content:center;
-  font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--teal);transition:all .4s}
-.step.active .step-n{background:var(--teal);color:var(--navy);box-shadow:0 0 12px rgba(0,196,180,.5)}
+.step-n{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--teal);display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--teal);transition:all .4s}
+.step.active .step-n{background:var(--teal);color:var(--navy);box-shadow:0 0 14px rgba(0,196,180,.5)}
 .step.done .step-n{background:rgba(0,196,180,.18)}
 .step-lbl{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--gray);text-transform:uppercase}
-.step-line{flex:1;height:1px;background:var(--border);min-width:10px;max-width:30px;margin-bottom:16px}
+.step-line{flex:1;height:1px;background:var(--border);min-width:10px;max-width:32px;margin-bottom:18px}
 
-/* MAIN */
-.main{position:relative;z-index:10;padding:0 16px 60px;max-width:460px;margin:0 auto}
-
-/* BRIEF */
-.brief{background:rgba(13,31,60,.85);border:1px solid var(--border);border-left:3px solid var(--teal);padding:12px 14px;margin-bottom:18px}
-.brief::before{content:'// MISSION BRIEFING';font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--teal);letter-spacing:2px;display:block;margin-bottom:6px}
-.brief p{font-size:13px;color:var(--gray);line-height:1.6}.brief strong{color:var(--teal)}
-
-/* SCREENS */
+/* LAYOUT */
+.main{position:relative;z-index:10;padding:0 18px 60px;max-width:460px;margin:0 auto}
 .screen{display:none}
 .screen.active{display:block;animation:fadeUp .4s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 
-/* SECTION LABEL */
+/* BRIEF */
+.brief{background:rgba(13,31,60,.85);border:1px solid var(--border);border-left:3px solid var(--teal);padding:13px 15px;margin-bottom:20px}
+.brief::before{content:'// MISSION BRIEFING';font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--teal);letter-spacing:2px;display:block;margin-bottom:7px}
+.brief p{font-size:13px;color:var(--gray);line-height:1.65}
+.brief strong{color:var(--teal)}
+
+/* LABELS */
 .sec-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--teal);letter-spacing:2px;display:block;margin-bottom:8px;text-transform:uppercase}
 
-/* FORM FIELDS */
-.field-row{display:flex;gap:8px;margin-bottom:12px}
+/* FIELDS */
+.field-row{display:flex;gap:10px;margin-bottom:12px}
 .field-group{display:flex;flex-direction:column;gap:5px;flex:1}
-.field-group.full{flex:none;width:100%}
 .field-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--gray);letter-spacing:1px}
-.field{background:rgba(0,0,0,.3);border:1px solid var(--border);color:var(--white);padding:11px 13px;
-  font-family:'Share Tech Mono',monospace;font-size:13px;width:100%;outline:none;transition:border-color .25s;border-radius:2px}
+.field{background:rgba(0,0,0,.3);border:1px solid var(--border);color:var(--white);padding:12px 13px;font-family:'Share Tech Mono',monospace;font-size:13px;width:100%;outline:none;transition:border-color .25s;border-radius:2px}
 .field:focus{border-color:var(--teal);box-shadow:0 0 8px rgba(0,196,180,.12)}
 .field::placeholder{color:rgba(143,163,177,.35)}
 
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:14px 16px;border:none;border-radius:2px;cursor:pointer;font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;letter-spacing:2px;text-transform:uppercase;transition:all .22s;white-space:nowrap;text-decoration:none}
+.btn-p{background:var(--teal);color:var(--navy)}
+.btn-p:hover:not(:disabled){background:#00d4c3;box-shadow:0 0 18px rgba(0,196,180,.35);transform:translateY(-1px)}
+.btn-s{background:transparent;color:var(--teal);border:1px solid var(--teal)}
+.btn-s:hover:not(:disabled){background:var(--teal-gl)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.btn-row{display:flex;gap:10px;margin-top:14px}
+.btn-full{width:100%;font-size:15px;padding:15px}
+
 /* CAPTURE */
-.capture-zone{background:rgba(13,31,60,.5);border:2px dashed var(--border);padding:30px 20px;text-align:center;cursor:pointer;transition:all .3s;margin-bottom:0}
+.capture-zone{background:rgba(13,31,60,.5);border:2px dashed var(--border);padding:32px 20px;text-align:center;cursor:pointer;transition:all .3s;border-radius:2px}
 .capture-zone:hover{border-color:rgba(0,196,180,.5);background:rgba(13,31,60,.7)}
-.capture-zone .c-icon{font-size:42px;display:block;margin-bottom:9px}
-.capture-zone h3{font-family:'Oswald',sans-serif;font-size:18px;letter-spacing:2px;margin-bottom:4px}
+.c-icon{font-size:40px;display:block;margin-bottom:10px}
+.capture-zone h3{font-family:'Oswald',sans-serif;font-size:18px;letter-spacing:2px;margin-bottom:5px}
 .capture-zone p{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--gray)}
-
-#preview-wrap{display:none;position:relative;border:1px solid var(--border)}
-#preview-img{width:100%;max-height:240px;object-fit:cover;display:block}
+#preview-wrap{display:none;position:relative;border:1px solid var(--border);margin-top:14px}
+#preview-img{width:100%;max-height:250px;object-fit:cover;display:block}
 .preview-frame{position:absolute;inset:0;border:2px solid var(--teal);pointer-events:none}
-.preview-tag{position:absolute;bottom:0;left:0;right:0;background:rgba(10,22,40,.9);padding:5px 10px;
-  font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--teal);letter-spacing:2px}
-
-#cam-wrap{display:none;position:relative;border:1px solid var(--border)}
-#cam-video{width:100%;max-height:260px;object-fit:cover;display:block;transform:scaleX(-1)}
+.preview-tag{position:absolute;bottom:0;left:0;right:0;background:rgba(10,22,40,.9);padding:6px 10px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--teal);letter-spacing:2px}
+#cam-wrap{display:none;position:relative;border:1px solid var(--border);margin-top:14px}
+#cam-video{width:100%;max-height:270px;object-fit:cover;display:block;transform:scaleX(-1)}
 .cam-hud{position:absolute;inset:0;pointer-events:none}
 .hc{position:absolute;width:16px;height:16px;border-color:var(--teal);border-style:solid}
-.hc.tl2{top:7px;left:7px;border-width:2px 0 0 2px}.hc.tr2{top:7px;right:7px;border-width:2px 2px 0 0}
-.hc.bl2{bottom:7px;left:7px;border-width:0 0 2px 2px}.hc.br2{bottom:7px;right:7px;border-width:0 2px 2px 0}
+.hc.tl2{top:8px;left:8px;border-width:2px 0 0 2px}.hc.tr2{top:8px;right:8px;border-width:2px 2px 0 0}
+.hc.bl2{bottom:8px;left:8px;border-width:0 0 2px 2px}.hc.br2{bottom:8px;right:8px;border-width:0 2px 2px 0}
 .hc-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;border:1px solid rgba(0,196,180,.4);border-radius:50%}
-.hc-lbl{position:absolute;top:6px;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--teal);letter-spacing:2px;white-space:nowrap}
+.hc-lbl{position:absolute;top:7px;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--teal);letter-spacing:2px;white-space:nowrap}
 
-/* STYLE CARDS */
-.style-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.style-card{background:rgba(13,31,60,.6);border:1px solid var(--border);padding:10px 11px;cursor:pointer;transition:all .2s;position:relative}
-.style-card:hover{border-color:rgba(0,196,180,.5)}
-.style-card.sel{border-color:var(--teal);background:rgba(0,196,180,.08)}
-.style-card.sel::after{content:'✓';position:absolute;top:5px;right:8px;color:var(--teal);font-size:11px}
-.s-icon{font-size:20px;display:block;margin-bottom:3px}
-.s-name{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px}
-.s-desc{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--gray);margin-top:2px;line-height:1.4}
+/* CARDS */
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.card{background:rgba(13,31,60,.6);border:1px solid var(--border);padding:12px;cursor:pointer;transition:all .2s;position:relative;border-radius:2px}
+.card:hover{border-color:rgba(0,196,180,.5);background:rgba(13,31,60,.8)}
+.card.sel{border-color:var(--teal);background:rgba(0,196,180,.08)}
+.card.sel::after{content:'✓';position:absolute;top:7px;right:9px;color:var(--teal);font-size:11px;font-weight:bold}
+.card-icon{font-size:22px;display:block;margin-bottom:5px}
+.card-name{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px;color:var(--white)}
+.card-desc{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--gray);margin-top:3px;line-height:1.4}
+
+/* GENDER */
+.gender-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gender-card{background:rgba(13,31,60,.6);border:1px solid var(--border);padding:14px 12px;cursor:pointer;transition:all .2s;position:relative;border-radius:2px;text-align:center}
+.gender-card:hover{border-color:rgba(0,196,180,.5)}
+.gender-card.sel{border-color:var(--teal);background:rgba(0,196,180,.08)}
+.gender-card.sel::after{content:'✓';position:absolute;top:7px;right:9px;color:var(--teal);font-size:11px;font-weight:bold}
+.gender-icon{font-size:26px;display:block;margin-bottom:6px}
+.gender-name{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:2px;color:var(--white)}
 
 /* GDPR */
-.gdpr-box{background:rgba(13,31,60,.7);border:1px solid var(--border);padding:14px;margin-bottom:14px}
+.gdpr-box{background:rgba(13,31,60,.7);border:1px solid var(--border);padding:14px;margin-bottom:16px}
 .gdpr-box::before{content:'// PROTECCIÓN DE DATOS — RGPD';font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--teal);letter-spacing:2px;display:block;margin-bottom:10px}
-.gdpr-text{font-size:11px;color:var(--gray);line-height:1.7;margin-bottom:12px}
-.gdpr-text strong{color:var(--white)}
-.gdpr-text a{color:var(--teal);text-decoration:none}
+.gdpr-text{font-size:11.5px;color:var(--gray);line-height:1.7;margin-bottom:12px}
+.gdpr-text strong{color:var(--white)}.gdpr-text a{color:var(--teal);text-decoration:none}
 .consent-row{display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:4px 0}
-.consent-check{width:18px;height:18px;border:1.5px solid var(--teal);background:transparent;flex-shrink:0;margin-top:1px;
-  display:flex;align-items:center;justify-content:center;transition:all .2s;cursor:pointer}
+.consent-check{width:18px;height:18px;border:1.5px solid var(--teal);background:transparent;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .2s;border-radius:2px}
 .consent-check.checked{background:var(--teal)}
 .consent-check.checked::after{content:'✓';color:var(--navy);font-size:11px;font-weight:bold}
-.consent-lbl{font-size:12px;color:var(--gray);line-height:1.5;font-family:'Rajdhani',sans-serif}
+.consent-lbl{font-size:12px;color:var(--gray);line-height:1.55}
 .consent-lbl strong{color:var(--white)}
 
-/* BUTTONS */
-.btn-row{display:flex;gap:10px;margin-top:12px}
-.btn{flex:1;padding:13px 12px;border:none;border-radius:2px;font-family:'Oswald',sans-serif;font-size:14px;
-  font-weight:600;letter-spacing:2px;cursor:pointer;transition:all .22s;text-transform:uppercase}
-.btn-p{background:var(--teal);color:var(--navy)}
-.btn-p:hover:not(:disabled){background:#00d4c3;box-shadow:0 0 16px rgba(0,196,180,.35);transform:translateY(-1px)}
-.btn-s{background:transparent;color:var(--teal);border:1px solid var(--teal)}
-.btn-s:hover:not(:disabled){background:var(--teal-glow)}
-.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
-.btn-full{width:100%;font-size:15px;padding:15px}
-.mt{margin-top:14px}
-
-/* ERROR / INFO */
-.err{background:rgba(255,59,59,.1);border:1px solid rgba(255,59,59,.35);border-left:3px solid var(--red);
-  padding:10px 13px;margin-top:12px;font-family:'Share Tech Mono',monospace;font-size:11px;color:#ff9090;line-height:1.5;display:none}
+/* DIVIDER / ERROR */
+.sec-div{height:1px;background:var(--border);margin:18px 0}
+.err{background:rgba(255,59,59,.1);border:1px solid rgba(255,59,59,.35);border-left:3px solid var(--red);padding:10px 13px;margin-top:12px;font-family:'Share Tech Mono',monospace;font-size:11px;color:#ff9090;line-height:1.5;display:none}
 .err.on{display:block}
 
-/* SECTION DIVIDER */
-.sec-div{height:1px;background:var(--border);margin:18px 0}
-
 /* PROCESSING */
-.proc-wrap{text-align:center;padding:32px 16px}
-.radar{width:140px;height:140px;border-radius:50%;border:2px solid rgba(0,196,180,.22);margin:0 auto 26px;position:relative;display:flex;align-items:center;justify-content:center}
+.proc-wrap{text-align:center;padding:40px 16px}
+.radar{width:140px;height:140px;border-radius:50%;border:2px solid rgba(0,196,180,.22);margin:0 auto 28px;position:relative;display:flex;align-items:center;justify-content:center}
 .radar::before,.radar::after{content:'';position:absolute;border-radius:50%;border:1px solid rgba(0,196,180,.12)}
 .radar::before{width:68%;height:68%}.radar::after{width:36%;height:36%}
 .rsweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(0,196,180,.4) 0deg,transparent 90deg);animation:rot 2s linear infinite}
 @keyframes rot{to{transform:rotate(360deg)}}
 .rdot{width:6px;height:6px;background:var(--teal);border-radius:50%;box-shadow:0 0 8px var(--teal);position:relative;z-index:2}
 .proc-title{font-family:'Oswald',sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:10px}
-.proc-log{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--teal);min-height:16px;letter-spacing:1px}
-.prog-wrap{background:rgba(0,0,0,.3);border:1px solid var(--border);height:3px;margin:13px 0;overflow:hidden}
-.prog{height:100%;background:linear-gradient(90deg,var(--teal-dark),var(--teal));width:0%;transition:width .6s ease;box-shadow:0 0 6px var(--teal)}
-.proc-note{font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(143,163,177,.45);margin-top:8px}
+.proc-log{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--teal);min-height:18px;letter-spacing:1px}
+.prog-wrap{background:rgba(0,0,0,.3);border:1px solid var(--border);height:3px;margin:14px 0;overflow:hidden}
+.prog{height:100%;background:linear-gradient(90deg,var(--teal-dk),var(--teal));width:0%;transition:width .6s ease;box-shadow:0 0 6px var(--teal)}
+.proc-note{font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(143,163,177,.45);margin-top:10px;line-height:1.6}
 
 /* RESULT */
-.r-badge{display:inline-block;background:rgba(0,196,180,.1);border:1px solid var(--teal);font-family:'Share Tech Mono',monospace;
-  font-size:10px;color:var(--teal);letter-spacing:3px;padding:4px 14px;margin-bottom:12px;animation:blink 2s infinite}
-.r-title{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;letter-spacing:2px;margin-bottom:2px;text-align:center}
-.agent-id{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:2px;margin-bottom:16px;text-align:center}
-.r-img-wrap{position:relative;border:1px solid var(--border);margin-bottom:16px}
+.result-top{text-align:center;margin-bottom:16px}
+.r-badge{display:inline-block;background:rgba(0,196,180,.1);border:1px solid var(--teal);font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:3px;padding:4px 14px;margin-bottom:12px;animation:blink 2s infinite}
+.r-title{font-family:'Oswald',sans-serif;font-size:24px;font-weight:700;letter-spacing:2px;margin-bottom:3px}
+.agent-id{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:2px}
+.r-img-wrap{position:relative;border:1px solid var(--border);margin-bottom:18px}
 #result-img{width:100%;display:block;border:2px solid var(--teal)}
-.r-overlay{position:absolute;bottom:0;left:0;right:0;
-  background:linear-gradient(0deg,rgba(10,22,40,.95) 0%,transparent 100%);
-  padding:20px 12px 9px;display:flex;align-items:flex-end;justify-content:space-between}
-.ro-title{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:2px;color:var(--teal);display:block}
+.r-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(10,22,40,.95) 0%,transparent 100%);padding:22px 14px 10px;display:flex;align-items:flex-end;justify-content:space-between}
+.ro-title{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:2px;color:var(--teal);display:block}
 .ro-sub{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--gray)}
 .ro-r{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--teal);opacity:.6}
-.r-name-overlay{position:absolute;top:10px;left:0;right:0;text-align:center;
-  font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:3px;color:var(--teal);
-  text-shadow:0 0 8px rgba(0,0,0,.8);pointer-events:none}
-.r-actions{display:flex;flex-direction:column;gap:8px;text-align:center}
+.r-actions{display:flex;flex-direction:column;gap:10px}
 
-/* FOOTER */
-.footer{position:relative;z-index:10;text-align:center;padding:0 20px 20px;font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(143,163,177,.3);letter-spacing:1px}
-
-/* PARTICLES */
+/* FOOTER / PARTICLES */
+.footer{position:relative;z-index:10;text-align:center;padding:0 20px 24px;font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(143,163,177,.3);letter-spacing:1px}
 .pt{position:fixed;width:2px;height:2px;background:var(--teal);border-radius:50%;pointer-events:none;animation:fup linear infinite;opacity:0;z-index:1}
 @keyframes fup{0%{opacity:0;transform:translateY(0)}10%{opacity:.4}90%{opacity:.15}100%{opacity:0;transform:translateY(-100vh)}}
 .dots::after{content:'';animation:ld 1.4s steps(4,end) infinite}
@@ -188,13 +164,10 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 </head>
 <body>
 
-<div class="corner tl"></div>
-<div class="corner tr"></div>
-<div class="corner bl"></div>
-<div class="corner br"></div>
+<div class="corner c-tl"></div><div class="corner c-tr"></div>
+<div class="corner c-bl"></div><div class="corner c-br"></div>
 <div id="pts"></div>
 
-<!-- HEADER -->
 <div class="header">
   <div class="classified">TOP SECRET // CLEARANCE LEVEL 5</div>
   <div class="logo-row">
@@ -206,7 +179,6 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 </div>
 <div class="divider"></div>
 
-<!-- STEPS -->
 <div class="steps">
   <div class="step active" id="s1"><div class="step-n">01</div><div class="step-lbl">Datos</div></div>
   <div class="step-line"></div>
@@ -224,48 +196,43 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     <p>Agente, ha sido seleccionado para la <strong>Unidad de Control de Agentes de IA</strong>. Su misión: gobernar y supervisar agentes de IA para evitar acciones no autorizadas. Complete el registro para recibir sus credenciales.</p>
   </div>
 
-  <!-- ══ SCREEN 1: DATOS + CONSENTIMIENTO ══ -->
+  <!-- SCREEN 1: DATOS -->
   <div class="screen active" id="scr-datos">
     <span class="sec-lbl">// IDENTIFICACIÓN DEL AGENTE</span>
     <div class="field-row">
       <div class="field-group">
         <span class="field-lbl">NOMBRE</span>
-        <input class="field" id="inp-nombre" type="text" placeholder="Nombre" maxlength="40">
+        <input class="field" id="inp-nombre" type="text" placeholder="Nombre" maxlength="40" autocomplete="given-name">
       </div>
       <div class="field-group">
         <span class="field-lbl">APELLIDO</span>
-        <input class="field" id="inp-apellido" type="text" placeholder="Apellido" maxlength="40">
+        <input class="field" id="inp-apellido" type="text" placeholder="Apellido" maxlength="40" autocomplete="family-name">
       </div>
     </div>
     <div class="field-group" style="margin-bottom:18px">
       <span class="field-lbl">EMAIL</span>
-      <input class="field" id="inp-email" type="email" placeholder="agente@correo.com" maxlength="100">
+      <input class="field" id="inp-email" type="email" placeholder="agente@correo.com" maxlength="100" autocomplete="email">
     </div>
-
     <div class="sec-div"></div>
-
-    <!-- GDPR -->
     <div class="gdpr-box">
       <div class="gdpr-text">
         <strong>Responsable del tratamiento:</strong> SailPoint Technologies, Inc.<br><br>
-        <strong>Finalidad:</strong> Recopilamos su nombre, apellido y dirección de correo electrónico con el fin de gestionar su participación en el evento <em>Adaptive Identity</em> y enviarle, si así lo autoriza, comunicaciones comerciales relacionadas con los productos y servicios de SailPoint.<br><br>
-        <strong>Base jurídica:</strong> El tratamiento se basa en el consentimiento explícito del interesado, de conformidad con el artículo 6.1.a) del Reglamento (UE) 2016/679 (RGPD).<br><br>
-        <strong>Conservación:</strong> Sus datos se conservarán durante un máximo de 2 años desde la recogida, o hasta que retire su consentimiento.<br><br>
-        <strong>Derechos:</strong> Tiene derecho de acceso, rectificación, supresión, limitación, portabilidad y oposición. Puede ejercerlos escribiendo a <a href="mailto:privacy@sailpoint.com">privacy@sailpoint.com</a>. Asimismo, puede presentar una reclamación ante la autoridad de control competente (en España, la AEPD: <a href="https://www.aepd.es" target="_blank">aepd.es</a>).<br><br>
-        <strong>Transferencias internacionales:</strong> Sus datos podrán ser transferidos a servidores ubicados en Estados Unidos, con las garantías adecuadas previstas en el RGPD.
+        <strong>Finalidad:</strong> Recopilamos su nombre, apellido y correo electrónico para gestionar su participación en el evento <em>Adaptive Identity</em> y enviarle, si lo autoriza, comunicaciones sobre productos y servicios de SailPoint.<br><br>
+        <strong>Base jurídica:</strong> Consentimiento explícito del interesado, conforme al art. 6.1.a) del RGPD (UE) 2016/679.<br><br>
+        <strong>Conservación:</strong> Máximo 2 años desde la recogida o hasta que retire su consentimiento.<br><br>
+        <strong>Derechos:</strong> Acceso, rectificación, supresión, limitación, portabilidad y oposición. Escríbanos a <a href="mailto:privacy@sailpoint.com">privacy@sailpoint.com</a>. Puede reclamar ante la AEPD: <a href="https://www.aepd.es" target="_blank">aepd.es</a>.<br><br>
+        <strong>Transferencias internacionales:</strong> Sus datos podrán transferirse a servidores en EE.UU. con las garantías previstas en el RGPD.
       </div>
-      <div class="consent-row" id="consent-row" onclick="toggleConsent()">
+      <div class="consent-row" onclick="toggleConsent()">
         <div class="consent-check" id="consent-check"></div>
-        <span class="consent-lbl">He leído y acepto el tratamiento de mis datos personales según la política de privacidad descrita, y autorizo a SailPoint a contactarme con información sobre sus productos y servicios. <strong>Este consentimiento es necesario para participar.</strong></span>
+        <span class="consent-lbl">He leído y acepto el tratamiento de mis datos personales y autorizo a SailPoint a contactarme con información sobre sus productos y servicios. <strong>Consentimiento necesario para participar.</strong></span>
       </div>
     </div>
-
     <div class="err" id="err-datos"></div>
-
-    <button class="btn btn-p btn-full mt" id="btn-next-datos">CONTINUAR →</button>
+    <button class="btn btn-p btn-full" style="margin-top:20px" id="btn-next-datos">CONTINUAR →</button>
   </div>
 
-  <!-- ══ SCREEN 2: FOTO ══ -->
+  <!-- SCREEN 2: FOTO -->
   <div class="screen" id="scr-foto">
     <span class="sec-lbl">// VERIFICACIÓN BIOMÉTRICA</span>
     <div class="capture-zone" id="drop-zone">
@@ -273,13 +240,11 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       <h3>CAPTURA FACIAL</h3>
       <p class="dots">Esperando imagen del agente</p>
     </div>
-
     <div id="preview-wrap">
       <img id="preview-img" src="" alt="">
       <div class="preview-frame"></div>
       <div class="preview-tag">// BIOMETRIC SCAN — CANDIDATE IDENTIFIED</div>
     </div>
-
     <div id="cam-wrap">
       <video id="cam-video" autoplay playsinline muted></video>
       <div class="cam-hud">
@@ -289,63 +254,66 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <div class="hc-lbl">// BIOMETRIC SCAN ACTIVE</div>
       </div>
     </div>
-
-    <div class="btn-row">
-      <button class="btn btn-s" id="btn-cam">📸 CÁMARA</button>
-      <button class="btn btn-s" id="btn-upload">🖼 GALERÍA</button>
+    <div class="btn-row" style="margin-top:14px">
+      <button class="btn btn-s" style="flex:1" id="btn-cam">📸 CÁMARA</button>
+      <button class="btn btn-s" style="flex:1" id="btn-upload">🖼 GALERÍA</button>
     </div>
     <input type="file" id="file-in" accept="image/*" style="display:none">
-
-    <div id="cam-controls" style="display:none" class="btn-row">
-      <button class="btn btn-p" id="btn-snap" style="flex:2">⚡ CAPTURAR</button>
-      <button class="btn btn-s" id="btn-cam-cancel">✕</button>
+    <div id="cam-controls" class="btn-row" style="display:none;margin-top:10px">
+      <button class="btn btn-p" style="flex:2" id="btn-snap">⚡ CAPTURAR</button>
+      <button class="btn btn-s" style="flex:0 0 50px" id="btn-cam-cancel">✕</button>
     </div>
-
     <div class="err" id="err-foto"></div>
-
-    <div class="btn-row mt">
-      <button class="btn btn-s" id="btn-back-foto">← VOLVER</button>
-      <button class="btn btn-p" id="btn-next-foto" disabled style="flex:2">CONTINUAR →</button>
+    <div class="btn-row" style="margin-top:20px">
+      <button class="btn btn-s" style="flex:0 0 120px" id="btn-back-foto">← VOLVER</button>
+      <button class="btn btn-p" style="flex:1" id="btn-next-foto" disabled>CONTINUAR →</button>
     </div>
   </div>
 
-  <!-- ══ SCREEN 3: MISIÓN ══ -->
+  <!-- SCREEN 3: MISIÓN -->
   <div class="screen" id="scr-mision">
     <span class="sec-lbl">// SELECCIONA TU MISIÓN</span>
-    <div class="style-grid" id="style-grid">
-      <div class="style-card sel" data-style="james_bond">
-        <span class="s-icon">🥂</span>
-        <div class="s-name">JAMES BOND</div>
-        <div class="s-desc">Agente clásico de élite</div>
+    <div class="card-grid">
+      <div class="card sel" data-style="james_bond">
+        <span class="card-icon">🥂</span>
+        <div class="card-name">JAMES BOND</div>
+        <div class="card-desc">Agente clásico de élite</div>
       </div>
-      <div class="style-card" data-style="mission_impossible">
-        <span class="s-icon">💥</span>
-        <div class="s-name">M:I TÁCTICO</div>
-        <div class="s-desc">Operativo urbano</div>
+      <div class="card" data-style="mission_impossible">
+        <span class="card-icon">💥</span>
+        <div class="card-name">M:I TÁCTICO</div>
+        <div class="card-desc">Operativo urbano</div>
       </div>
-      <div class="style-card" data-style="ai_cyber">
-        <span class="s-icon">🤖</span>
-        <div class="s-name">CYBER AGENT</div>
-        <div class="s-desc">Futuro digital IA</div>
+      <div class="card" data-style="ai_cyber">
+        <span class="card-icon">🤖</span>
+        <div class="card-name">CYBER AGENT</div>
+        <div class="card-desc">Futuro digital IA</div>
       </div>
-      <div class="style-card" data-style="sailpoint_spy">
-        <span class="s-icon">🔒</span>
-        <div class="s-name">SP ELITE</div>
-        <div class="s-desc">Espía de identidad</div>
-      </div>
-    </div>
-        
-        </div>
+      <div class="card" data-style="sailpoint_spy">
+        <span class="card-icon">🔒</span>
+        <div class="card-name">SP ELITE</div>
+        <div class="card-desc">Espía de identidad</div>
       </div>
     </div>
-
-    <div class="btn-row mt" style="margin-top:18px">
-      <button class="btn btn-s" id="btn-back-mision">← VOLVER</button>
-      <button class="btn btn-p" id="btn-go" style="flex:2">🕵️ GENERAR IDENTIDAD</button>
+    <div class="sec-div"></div>
+    <span class="sec-lbl">// PERFIL DEL AGENTE</span>
+    <div class="gender-grid">
+      <div class="gender-card sel" id="g-male" onclick="setGender('male')">
+        <span class="gender-icon">🕵️</span>
+        <div class="gender-name">AGENTE</div>
+      </div>
+      <div class="gender-card" id="g-female" onclick="setGender('female')">
+        <span class="gender-icon">🕵️‍♀️</span>
+        <div class="gender-name">AGENTA</div>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-top:22px">
+      <button class="btn btn-s" style="flex:0 0 120px" id="btn-back-mision">← VOLVER</button>
+      <button class="btn btn-p" style="flex:1" id="btn-go">🕵️ GENERAR IDENTIDAD</button>
     </div>
   </div>
 
-  <!-- ══ SCREEN 4: PROCESSING ══ -->
+  <!-- SCREEN 4: PROCESSING -->
   <div class="screen" id="scr-proc">
     <div class="proc-wrap">
       <div class="radar">
@@ -355,20 +323,19 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       <div class="proc-title">PROCESANDO<span style="color:var(--teal)" class="dots"></span></div>
       <div class="prog-wrap"><div class="prog" id="prog"></div></div>
       <div class="proc-log" id="proc-log">Iniciando protocolo de identidad...</div>
-      <div class="proc-note" style="margin-top:14px">La IA está insertando tu cara en la escena.<br>Puede tardar 30-60 segundos.</div>
+      <div class="proc-note">La IA está construyendo tu escena de misión.<br>Puede tardar entre 30 y 60 segundos.</div>
     </div>
   </div>
 
-  <!-- ══ SCREEN 5: RESULT ══ -->
+  <!-- SCREEN 5: RESULT -->
   <div class="screen" id="scr-result">
-    <div style="text-align:center;margin-bottom:14px">
+    <div class="result-top">
       <div class="r-badge">// IDENTIDAD CONFIRMADA</div>
       <div class="r-title">AGENTE ACTIVADO</div>
       <div class="agent-id" id="agent-id">AGENT ID: AG-????-????</div>
     </div>
     <div class="r-img-wrap">
-      <img id="result-img" src="" alt="Spy">
-      <div class="r-name-overlay" id="r-name-overlay"></div>
+      <img id="result-img" src="" alt="Spy Agent">
       <div class="r-overlay">
         <div>
           <span class="ro-title">ADAPTIVE IDENTITY</span>
@@ -380,270 +347,230 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     <div class="r-actions">
       <button class="btn btn-p btn-full" id="btn-dl">⬇️ DESCARGAR CREDENCIAL</button>
       <button class="btn btn-s btn-full" id="btn-share">📤 COMPARTIR</button>
-      <button class="btn btn-s btn-full" id="btn-retry" style="font-size:12px;padding:12px">🔄 NUEVA MISIÓN</button>
+      <button class="btn btn-s btn-full" style="font-size:12px;padding:12px;letter-spacing:1px" id="btn-retry">🔄 NUEVA MISIÓN</button>
     </div>
   </div>
-
-</div><!-- /main -->
+</div>
 
 <div class="footer">SAILPOINT ADAPTIVE IDENTITY // OPERATION AI CONTROL // CLASSIFIED</div>
 
 <script>
-// ── STATE ──────────────────────────────────────────────
-let photoB64 = null;
-let selectedStyle = 'james_bond';
-let mediaStream = null;
-let agentId = '';
-let consentGiven = false;
+// STATE
+let photoB64 = null, selectedStyle = 'james_bond', selectedGender = 'male';
+let consentGiven = false, agentId = '', mediaStream = null;
+let logT = null, progT = null;
 
-// ── PARTICLES ──────────────────────────────────────────
-const ptc = document.getElementById('pts');
-for(let i=0;i<16;i++){
-  const p=document.createElement('div');p.className='pt';
-  p.style.cssText=`left:${Math.random()*100}vw;animation-delay:${Math.random()*9}s;animation-duration:${7+Math.random()*8}s`;
-  ptc.appendChild(p);
-}
+// PARTICLES
+(function(){
+  const c = document.getElementById('pts');
+  for(let i=0;i<16;i++){
+    const p = document.createElement('div'); p.className='pt';
+    p.style.cssText = `left:${Math.random()*100}vw;animation-delay:${Math.random()*9}s;animation-duration:${7+Math.random()*8}s`;
+    c.appendChild(p);
+  }
+})();
 
-// ── STEPS ──────────────────────────────────────────────
+// STEPS
 function setStep(n){
   [1,2,3,4,5].forEach(i=>{
-    const el=document.getElementById('s'+i);
+    const el = document.getElementById('s'+i);
     el.classList.remove('active','done');
-    if(i<n)el.classList.add('done');
-    if(i===n)el.classList.add('active');
+    if(i<n) el.classList.add('done');
+    if(i===n) el.classList.add('active');
   });
 }
-function showScr(id,step){
+function showScr(id, step){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   setStep(step);
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// ── CONSENT ────────────────────────────────────────────
+// CONSENT
 function toggleConsent(){
-  consentGiven=!consentGiven;
-  const ch=document.getElementById('consent-check');
-  ch.classList.toggle('checked',consentGiven);
+  consentGiven = !consentGiven;
+  document.getElementById('consent-check').classList.toggle('checked', consentGiven);
 }
 
-// ── ERROR ──────────────────────────────────────────────
-function showErr(id,msg){
-  const el=document.getElementById(id);
-  if(msg){el.textContent='⚠ '+msg;el.classList.add('on');}
-  else el.classList.remove('on');
+// ERROR
+function showErr(id, msg){
+  const el = document.getElementById(id);
+  msg ? (el.textContent='⚠ '+msg, el.classList.add('on')) : el.classList.remove('on');
 }
 
-// ── SCREEN 1 → 2 ──────────────────────────────────────
-document.getElementById('btn-next-datos').addEventListener('click',()=>{
-  const nombre=document.getElementById('inp-nombre').value.trim();
-  const apellido=document.getElementById('inp-apellido').value.trim();
-  const email=document.getElementById('inp-email').value.trim();
-  const emailOk=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-  if(!nombre) return showErr('err-datos','Introduce tu nombre.');
-  if(!apellido) return showErr('err-datos','Introduce tu apellido.');
-  if(!email||!emailOk) return showErr('err-datos','Introduce un email válido.');
+// SCREEN 1 → 2
+document.getElementById('btn-next-datos').addEventListener('click', ()=>{
+  const nombre   = document.getElementById('inp-nombre').value.trim();
+  const apellido = document.getElementById('inp-apellido').value.trim();
+  const email    = document.getElementById('inp-email').value.trim();
+  if(!nombre)       return showErr('err-datos','Introduce tu nombre.');
+  if(!apellido)     return showErr('err-datos','Introduce tu apellido.');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showErr('err-datos','Introduce un email válido.');
   if(!consentGiven) return showErr('err-datos','Debes aceptar el tratamiento de datos para continuar.');
   showErr('err-datos','');
-  showScr('scr-foto',2);
+  showScr('scr-foto', 2);
 });
 
-// ── CAMERA ─────────────────────────────────────────────
-const camWrap=document.getElementById('cam-wrap');
-const camVideo=document.getElementById('cam-video');
-const camCtrls=document.getElementById('cam-controls');
-const previewWrap=document.getElementById('preview-wrap');
-const previewImg=document.getElementById('preview-img');
-const dropZone=document.getElementById('drop-zone');
+// CAMERA
+const camWrap=document.getElementById('cam-wrap'), camVideo=document.getElementById('cam-video');
+const camCtrls=document.getElementById('cam-controls'), previewWrap=document.getElementById('preview-wrap');
+const previewImg=document.getElementById('preview-img'), dropZone=document.getElementById('drop-zone');
 
-document.getElementById('btn-cam').addEventListener('click',async()=>{
+document.getElementById('btn-cam').addEventListener('click', async ()=>{
   try{
-    mediaStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});
-    camVideo.srcObject=mediaStream;
-    camWrap.style.display='block';
-    camCtrls.style.display='flex';
-    dropZone.style.display='none';
-    previewWrap.style.display='none';
+    mediaStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});
+    camVideo.srcObject = mediaStream;
+    camWrap.style.display='block'; camCtrls.style.display='flex';
+    dropZone.style.display='none'; previewWrap.style.display='none';
     showErr('err-foto','');
-  }catch(e){showErr('err-foto','No se pudo acceder a la cámara. Verifica los permisos.');}
+  } catch(e){ showErr('err-foto','No se pudo acceder a la cámara. Verifica los permisos.'); }
 });
 
-document.getElementById('btn-snap').addEventListener('click',()=>{
+document.getElementById('btn-snap').addEventListener('click', ()=>{
   const c=document.createElement('canvas');
-  c.width=camVideo.videoWidth;c.height=camVideo.videoHeight;
-  const ctx=c.getContext('2d');
-  ctx.translate(c.width,0);ctx.scale(-1,1);
-  ctx.drawImage(camVideo,0,0);
+  c.width=camVideo.videoWidth; c.height=camVideo.videoHeight;
+  const ctx=c.getContext('2d'); ctx.translate(c.width,0); ctx.scale(-1,1); ctx.drawImage(camVideo,0,0);
   const url=c.toDataURL('image/jpeg',.92);
-  photoB64=url.split(',')[1];
-  previewImg.src=url;
-  previewWrap.style.display='block';
-  dropZone.style.display='none';
-  stopCam();
-  document.getElementById('btn-next-foto').disabled=false;
+  photoB64=url.split(',')[1]; previewImg.src=url;
+  previewWrap.style.display='block'; dropZone.style.display='none';
+  stopCam(); document.getElementById('btn-next-foto').disabled=false;
 });
 
-document.getElementById('btn-cam-cancel').addEventListener('click',()=>{
-  stopCam();dropZone.style.display='block';
-});
+document.getElementById('btn-cam-cancel').addEventListener('click', ()=>{ stopCam(); dropZone.style.display='block'; });
 
 function stopCam(){
-  if(mediaStream){mediaStream.getTracks().forEach(t=>t.stop());mediaStream=null;}
-  camWrap.style.display='none';
-  camCtrls.style.display='none';
+  if(mediaStream){ mediaStream.getTracks().forEach(t=>t.stop()); mediaStream=null; }
+  camWrap.style.display='none'; camCtrls.style.display='none';
 }
 
-document.getElementById('btn-upload').addEventListener('click',()=>document.getElementById('file-in').click());
-document.getElementById('file-in').addEventListener('change',e=>{
-  const f=e.target.files[0];if(!f)return;
+document.getElementById('btn-upload').addEventListener('click', ()=>document.getElementById('file-in').click());
+document.getElementById('file-in').addEventListener('change', e=>{
+  const f=e.target.files[0]; if(!f) return;
   const r=new FileReader();
   r.onload=ev=>{
-    const url=ev.target.result;
-    photoB64=url.split(',')[1];
-    previewImg.src=url;
-    previewWrap.style.display='block';
-    dropZone.style.display='none';
-    document.getElementById('btn-next-foto').disabled=false;
-    showErr('err-foto','');
+    const url=ev.target.result; photoB64=url.split(',')[1]; previewImg.src=url;
+    previewWrap.style.display='block'; dropZone.style.display='none';
+    document.getElementById('btn-next-foto').disabled=false; showErr('err-foto','');
   };
   r.readAsDataURL(f);
 });
-dropZone.addEventListener('click',()=>document.getElementById('file-in').click());
+dropZone.addEventListener('click', ()=>document.getElementById('file-in').click());
 
-// ── SCREEN NAV ─────────────────────────────────────────
-document.getElementById('btn-back-foto').addEventListener('click',()=>showScr('scr-datos',1));
-document.getElementById('btn-next-foto').addEventListener('click',()=>{
-  if(!photoB64)return showErr('err-foto','Primero captura o sube tu foto.');
-  showErr('err-foto','');showScr('scr-mision',3);
+// NAV
+document.getElementById('btn-back-foto').addEventListener('click', ()=>showScr('scr-datos',1));
+document.getElementById('btn-next-foto').addEventListener('click', ()=>{
+  if(!photoB64) return showErr('err-foto','Primero captura o sube tu foto.');
+  showErr('err-foto',''); showScr('scr-mision',3);
 });
-document.getElementById('btn-back-mision').addEventListener('click',()=>showScr('scr-foto',2));
+document.getElementById('btn-back-mision').addEventListener('click', ()=>showScr('scr-foto',2));
 
-// ── STYLE CARDS ────────────────────────────────────────
-document.querySelectorAll('.style-card').forEach(card=>{
-  card.addEventListener('click',()=>{
-    document.querySelectorAll('.style-card').forEach(c=>c.classList.remove('sel'));
-    card.classList.add('sel');
-    selectedStyle=card.dataset.style;
+// STYLE CARDS
+document.querySelectorAll('.card').forEach(card=>{
+  card.addEventListener('click', ()=>{
+    document.querySelectorAll('.card').forEach(c=>c.classList.remove('sel'));
+    card.classList.add('sel'); selectedStyle=card.dataset.style;
   });
 });
 
-// ── GENERATE ───────────────────────────────────────────
-const logs=[
-  'Verificando credenciales biométricas...',
-  'Analizando estructura facial...',
-  'Insertando identidad en escena...',
-  'Aplicando estilo de misión...',
-  'Renderizando escena clasificada...',
-  'Finalizando credencial de agente...',
-];
-let logT=null,progT=null;
+// GENDER
+function setGender(g){
+  selectedGender=g;
+  document.getElementById('g-male').classList.toggle('sel', g==='male');
+  document.getElementById('g-female').classList.toggle('sel', g==='female');
+}
 
+// PROCESSING ANIMATION
+const LOGS=['Verificando credenciales biométricas...','Generando escena de misión con IA...','Procesando identidad facial...','Aplicando estilo cinematográfico...','Renderizando escena clasificada...','Finalizando credencial de agente...'];
 function startAnim(){
-  let li=0,p=0;
-  const bar=document.getElementById('prog'),log=document.getElementById('proc-log');
-  logT=setInterval(()=>{log.textContent=logs[li%logs.length];li++;},4000);
-  progT=setInterval(()=>{p=Math.min(p+Math.random()*5,85);bar.style.width=p+'%';},1000);
+  let li=0, p=0;
+  const bar=document.getElementById('prog'), log=document.getElementById('proc-log');
+  logT=setInterval(()=>{ log.textContent=LOGS[li%LOGS.length]; li++; },4000);
+  progT=setInterval(()=>{ p=Math.min(p+Math.random()*5,85); bar.style.width=p+'%'; },1000);
 }
 function stopAnim(ok){
-  clearInterval(logT);clearInterval(progT);
+  clearInterval(logT); clearInterval(progT);
   document.getElementById('prog').style.width='100%';
   document.getElementById('proc-log').textContent=ok?'✓ Identidad generada correctamente':'✗ Error en el proceso';
 }
 
-document.getElementById('btn-go').addEventListener('click',async()=>{
+// GENERATE
+document.getElementById('btn-go').addEventListener('click', async ()=>{
   const nombre=document.getElementById('inp-nombre').value.trim();
   const apellido=document.getElementById('inp-apellido').value.trim();
   const email=document.getElementById('inp-email').value.trim();
+  stopCam(); agentId=randId(); showScr('scr-proc',4); startAnim();
 
-  stopCam();
-  showScr('scr-proc',4);
-  startAnim();
-
-  // Save to Google Sheets (fire and forget — don't block image generation)
-  agentId=randId();
-  fetch('/api/collect',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
+  // Google Sheets (non-blocking)
+  fetch('/api/collect',{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({firstName:nombre,lastName:apellido,email,agentId,style:selectedStyle,consent:true})
   }).catch(e=>console.warn('Collect error:',e));
 
   try{
-    const res=await fetch('/api/generate',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({imageBase64:photoB64,style:selectedStyle,firstName:nombre,lastName:apellido})
+    const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({imageBase64:photoB64,style:selectedStyle,gender:selectedGender})
     });
     const data=await res.json();
-    if(!res.ok)throw new Error(data.error||'Error desconocido');
+    if(!res.ok) throw new Error(data.error||'Error desconocido');
     stopAnim(true);
-    showResult(data.imageUrl,nombre,apellido);
-  }catch(e){
+    document.getElementById('result-img').src=data.imageUrl;
+    document.getElementById('agent-id').textContent='AGENT ID: '+agentId;
+    showScr('scr-result',5);
+  } catch(e){
     stopAnim(false);
     showScr('scr-mision',3);
     alert('Error al generar imagen: '+(e.message||'Inténtalo de nuevo.'));
   }
 });
 
-// ── RESULT ─────────────────────────────────────────────
+// UTILS
 function randId(){
-  const L='ABCDEFGHJKLMNPQRSTUVWXYZ',N='0123456789';
+  const L='ABCDEFGHJKLMNPQRSTUVWXYZ', N='0123456789';
   const r=(a,n)=>Array.from({length:n},()=>a[Math.floor(Math.random()*a.length)]).join('');
   return `AG-${r(L,2)}${r(N,2)}-${r(N,4)}`;
 }
 
-function showResult(url,nombre,apellido){
-  document.getElementById('result-img').src=url;
-  document.getElementById('agent-id').textContent='AGENT ID: '+agentId;
-  const nameStr=[nombre,apellido].filter(Boolean).join(' ').toUpperCase();
-  document.getElementById('r-name-overlay').textContent=nameStr?'// '+nameStr+' //':'';
-  showScr('scr-result',5);
-}
-
-// ── DOWNLOAD ───────────────────────────────────────────
-document.getElementById('btn-dl').addEventListener('click',async()=>{
+// DOWNLOAD
+document.getElementById('btn-dl').addEventListener('click', async ()=>{
   const url=document.getElementById('result-img').src;
   const btn=document.getElementById('btn-dl');
-  btn.textContent='⏳ Descargando...';btn.disabled=true;
+  btn.textContent='⏳ Descargando...'; btn.disabled=true;
   try{
-    const r=await fetch(url);const b=await r.blob();
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(b);a.download='sailpoint-agent-'+Date.now()+'.jpg';a.click();
+    const r=await fetch(url); const b=await r.blob();
+    const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+    a.download='sailpoint-agent-'+Date.now()+'.jpg'; a.click();
     btn.textContent='✓ DESCARGADO';
-  }catch{window.open(url,'_blank');btn.textContent='⬇️ DESCARGAR CREDENCIAL';}
-  finally{btn.disabled=false;setTimeout(()=>btn.textContent='⬇️ DESCARGAR CREDENCIAL',2500);}
+  } catch{ window.open(url,'_blank'); btn.textContent='⬇️ DESCARGAR CREDENCIAL'; }
+  finally{ btn.disabled=false; setTimeout(()=>btn.textContent='⬇️ DESCARGAR CREDENCIAL',2500); }
 });
 
-// ── SHARE ──────────────────────────────────────────────
-document.getElementById('btn-share').addEventListener('click',async()=>{
+// SHARE
+document.getElementById('btn-share').addEventListener('click', async ()=>{
   const url=document.getElementById('result-img').src;
   const btn=document.getElementById('btn-share');
   if(navigator.share){
     try{
-      const r=await fetch(url);const b=await r.blob();
+      const r=await fetch(url); const b=await r.blob();
       const f=new File([b],'sailpoint-spy-agent.jpg',{type:'image/jpeg'});
       await navigator.share({title:'SailPoint Adaptive Identity',text:'Soy un Agente de Identidad Adaptativa. #AdaptiveIdentity #SailPoint',files:[f]});
-    }catch{}
-  }else{
-    try{await navigator.clipboard.writeText(url);}catch{}
-    btn.textContent='✓ ENLACE COPIADO';setTimeout(()=>btn.textContent='📤 COMPARTIR',2000);
+    } catch{}
+  } else {
+    try{ await navigator.clipboard.writeText(url); } catch{}
+    btn.textContent='✓ ENLACE COPIADO'; setTimeout(()=>btn.textContent='📤 COMPARTIR',2000);
   }
 });
 
-// ── RETRY ──────────────────────────────────────────────
-document.getElementById('btn-retry').addEventListener('click',()=>{
-  photoB64=null;consentGiven=false;
-  previewWrap.style.display='none';
-  dropZone.style.display='block';
+// RETRY
+document.getElementById('btn-retry').addEventListener('click', ()=>{
+  photoB64=null; consentGiven=false; selectedStyle='james_bond'; selectedGender='male';
+  previewWrap.style.display='none'; dropZone.style.display='block';
   document.getElementById('btn-next-foto').disabled=true;
   document.getElementById('result-img').src='';
-  document.getElementById('inp-nombre').value='';
-  document.getElementById('inp-apellido').value='';
-  document.getElementById('inp-email').value='';
+  ['inp-nombre','inp-apellido','inp-email'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('consent-check').classList.remove('checked');
-  document.querySelectorAll('.style-card').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('.card').forEach(c=>c.classList.remove('sel'));
   document.querySelector('[data-style="james_bond"]').classList.add('sel');
-  selectedStyle='james_bond';
+  document.getElementById('g-male').classList.add('sel');
+  document.getElementById('g-female').classList.remove('sel');
   showScr('scr-datos',1);
 });
 </script>

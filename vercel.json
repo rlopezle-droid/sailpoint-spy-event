@@ -1,7 +1,7 @@
 {
   "rewrites": [
     { "source": "/api/generate", "destination": "/api/generate" },
-    { "source": "/api/collect", "destination": "/api/collect" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/api/collect",  "destination": "/api/collect"  },
+    { "source": "/(.*)",         "destination": "/index.html"   }
   ]
 }
