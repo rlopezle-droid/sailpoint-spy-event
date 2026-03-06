@@ -67,9 +67,7 @@ export default async function handler(req, res) {
         true_cfg: 1,
         width: 768,
         height: 1024,
-        output_format: "jpg",
-        output_quality: 95,
-      }
+       }
     );
 
     const imageUrl = String(Array.isArray(output) ? output[0] : output);
