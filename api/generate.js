@@ -82,7 +82,7 @@ export default async function handler(req, res) {
     // creates a face mask, and uses Ideogram Character for inpainting.
     console.log("Step 2: Face swap with fofr/face-swap-with-ideogram...");
     const swapOutput = await runWithRetry(replicate, "fofr/face-swap-with-ideogram", {
-      face_image: `data:image/jpeg;base64,${imageBase64}`,
+      character_image: `data:image/jpeg;base64,${imageBase64}`,
       target_image: sceneUrl,
     });
 
