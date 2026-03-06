@@ -1,21 +1,22 @@
 const Replicate = require("replicate");
 
-const STYLES = {
+// Step 1: Generate a spy background scene with a generic agent (no specific face)
+const STYLE_SCENES = {
   james_bond: {
-    prompt: "James Bond 007 spy, elegant black tuxedo with bow tie, holding a Walther PPK pistol, dramatic night cityscape background with blurred lights and reflections, cinematic movie poster composition, chiaroscuro lighting, deep blue and gold color palette, ultra realistic, 8K photography",
-    negative: "cartoon, anime, painting, deformed, blurry, bad anatomy, extra limbs, watermark",
+    scene: "A secret agent in an elegant black tuxedo with bow tie, holding a Walther PPK pistol, standing confidently. Dramatic night cityscape background with blurred neon lights and reflections. Cinematic movie poster composition, chiaroscuro lighting, deep blue and gold color palette. The agent's face is clearly visible, front-facing, sharp focus. Ultra realistic, 8K photography, full body portrait.",
+    negative: "cartoon, anime, deformed, blurry, watermark, sunglasses, mask, hat covering face",
   },
   mission_impossible: {
-    prompt: "Mission Impossible secret agent, black tactical suit, earpiece, rooftop of glass skyscraper at night with city lights below, dramatic orange and teal cinematic color grading, motion thriller atmosphere, ultra realistic, 8K",
-    negative: "cartoon, anime, painting, deformed, blurry, bad anatomy, watermark",
+    scene: "A secret agent in a black tactical suit with earpiece, standing on a glass skyscraper rooftop at night, city lights below, dramatic clouds. Agent's face is clearly visible, front-facing, sharp focus. Orange and teal cinematic color grading, thriller atmosphere. Ultra realistic, 8K, full body portrait.",
+    negative: "cartoon, anime, deformed, blurry, watermark, sunglasses, mask, helmet",
   },
   ai_cyber: {
-    prompt: "Futuristic cyberpunk AI governance agent, sleek holographic bodysuit with electric teal glowing circuit patterns, massive server room background with floating holographic data panels and streams, deep navy and electric teal neon glow, hyper detailed, ultra realistic, 8K",
-    negative: "cartoon, anime, deformed, blurry, bad anatomy, watermark, low quality",
+    scene: "A futuristic agent in a sleek holographic bodysuit with electric teal glowing circuit patterns, standing in a massive server room with floating holographic data panels. Agent's face clearly visible, front-facing, sharp focus. Deep navy and electric teal neon glow. Hyper detailed, ultra realistic, 8K, full body portrait.",
+    negative: "cartoon, anime, deformed, blurry, watermark, helmet, mask",
   },
   sailpoint_spy: {
-    prompt: "Elite corporate intelligence agent, sharp tailored navy business suit, subtle earpiece, background split between glowing identity vault access panels and dark city skyline, teal and navy color scheme, professional cinematic photography, ultra realistic, 8K",
-    negative: "cartoon, anime, deformed, blurry, bad anatomy, watermark",
+    scene: "An elite corporate intelligence agent in a sharp tailored navy business suit with subtle earpiece. Background: glowing identity vault access panels and dark city skyline. Agent's face clearly visible, front-facing, sharp focus. Teal and navy color scheme, professional cinematic photography. Ultra realistic, 8K, full body portrait.",
+    negative: "cartoon, anime, deformed, blurry, watermark, sunglasses",
   },
 };
 
@@ -26,42 +27,47 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const { imageBase64, style = "james_bond", firstName = "", lastName = "" } = req.body;
+  const { imageBase64, style = "james_bond" } = req.body;
   if (!imageBase64) return res.status(400).json({ error: "No image provided" });
   if (!process.env.REPLICATE_API_TOKEN) return res.status(500).json({ error: "REPLICATE_API_TOKEN not set" });
 
-  const s = STYLES[style] || STYLES.james_bond;
-  const nameTag = [firstName, lastName].filter(Boolean).join(" ");
-  const finalPrompt = nameTag
-    ? `${s.prompt}. Agent name badge reads "${nameTag}"`
-    : s.prompt;
+  const s = STYLE_SCENES[style] || STYLE_SCENES.james_bond;
+  const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
 
   try {
-    const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
+    // ── STEP 1: Generate spy background scene with FLUX ──────────────
+    console.log("Step 1: Generating spy scene with FLUX...");
+    const fluxOutput = await replicate.run("black-forest-labs/flux-1.1-pro", {
+      input: {
+        prompt: s.scene,
+        negative_prompt: s.negative,
+        aspect_ratio: "2:3",
+        output_format: "jpg",
+        output_quality: 90,
+        safety_tolerance: 2,
+      },
+    });
 
-    // zsxkib/instant-id-ipadapter-plus-face — correct version as of 2025
-    const output = await replicate.run(
-      "zsxkib/instant-id-ipadapter-plus-face:32402fb5c493d883aa6cf098ce3e4cc80f1fe6871f6ae7f632a8dbde01a3d161",
-      {
-        input: {
-          image: `data:image/jpeg;base64,${imageBase64}`,
-          prompt: finalPrompt,
-          negative_prompt: s.negative,
-          instantid_weight: 0.8,
-          ipadapter_weight: 0.8,
-          num_inference_steps: 30,
-          guidance_scale: 5,
-          width: 640,
-          height: 960,
-        },
-      }
-    );
+    const sceneUrl = Array.isArray(fluxOutput) ? String(fluxOutput[0]) : String(fluxOutput);
+    console.log("Step 1 done. Scene URL:", sceneUrl);
 
-    const imageUrl = Array.isArray(output) ? output[0] : output;
-    return res.status(200).json({ imageUrl: String(imageUrl) });
+    // ── STEP 2: Swap user's face into the scene ──────────────────────
+    console.log("Step 2: Swapping face with easel/advanced-face-swap...");
+    const swapOutput = await replicate.run("easel/advanced-face-swap", {
+      input: {
+        swap_image: `data:image/jpeg;base64,${imageBase64}`, // user's face
+        target_image: sceneUrl,                               // spy scene
+        hair_source: "target",                               // keep scene hair/style
+      },
+    });
+
+    const finalUrl = Array.isArray(swapOutput) ? String(swapOutput[0]) : String(swapOutput);
+    console.log("Step 2 done. Final URL:", finalUrl);
+
+    return res.status(200).json({ imageUrl: finalUrl });
 
   } catch (err) {
-    console.error("Replicate error:", err.message);
+    console.error("Pipeline error:", err.message);
     return res.status(500).json({ error: err.message || "Error generating image" });
   }
 }
