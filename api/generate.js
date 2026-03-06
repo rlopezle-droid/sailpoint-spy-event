@@ -1,68 +1,69 @@
 const Replicate = require("replicate");
 
-const STYLE_PROMPTS = {
-  james_bond: `Cinematic James Bond spy movie poster. A secret agent in a perfectly tailored black tuxedo with bow tie, 
-    holding a sleek pistol with confidence. Dramatic aerial night cityscape background with neon reflections. 
-    Deep blue-black shadows, gold and silver highlights. Text overlay at bottom: "ADAPTIVE IDENTITY". 
-    Ultra-realistic, 8K, professional movie poster photography, chiaroscuro lighting.`,
-
-  mission_impossible: `Mission Impossible tactical spy scene. Secret agent in dark tactical outfit with earpiece and gadgets. 
-    Glass skyscraper rooftop at night, city lights below, dramatic clouds. 
-    Moody thriller cinematography, blue and orange grading. HUD overlay: "OPERATION: ADAPTIVE IDENTITY". 
-    Photorealistic, cinematic, dramatic tension.`,
-
-  ai_cyber: `Futuristic cyberpunk AI governance agent portrait. Agent in holographic suit with glowing teal circuit patterns. 
-    Massive server room background with floating holographic identity panels and data streams. 
-    Deep navy and electric teal color palette (#00C4B4), white glow effects. 
-    Text: "AGENT CONTROL SYSTEM — ADAPTIVE IDENTITY — SAILPOINT". Ultra-realistic cyberpunk, hyper-detailed.`,
-
-  sailpoint_spy: `Premium corporate spy credential scene. Agent in sharp navy business suit with earpiece. 
-    Split background: secure identity vault with glowing access panels on left, dark city skyline on right. 
-    SailPoint navy and teal color scheme. Credential card overlay: "SAILPOINT // ADAPTIVE IDENTITY // AI GOVERNANCE DIVISION". 
-    Ultra-realistic, professional, cinematic lighting.`
+const STYLES = {
+  james_bond: {
+    prompt: "James Bond 007 spy, elegant black tuxedo with bow tie, holding a Walther PPK pistol, dramatic night cityscape background with blurred lights and reflections, cinematic movie poster composition, chiaroscuro lighting, deep blue and gold color palette, ultra realistic, 8K photography",
+    negative: "cartoon, anime, painting, deformed, blurry, bad anatomy, extra limbs, watermark",
+  },
+  mission_impossible: {
+    prompt: "Mission Impossible secret agent, black tactical suit, earpiece, rooftop of glass skyscraper at night with city lights below, dramatic orange and teal cinematic color grading, motion thriller atmosphere, ultra realistic, 8K",
+    negative: "cartoon, anime, painting, deformed, blurry, bad anatomy, watermark",
+  },
+  ai_cyber: {
+    prompt: "Futuristic cyberpunk AI governance agent, sleek holographic bodysuit with electric teal glowing circuit patterns, massive server room background with floating holographic data panels and streams, deep navy and electric teal (#00C4B4) neon glow, hyper detailed, ultra realistic, 8K",
+    negative: "cartoon, anime, deformed, blurry, bad anatomy, watermark, low quality",
+  },
+  sailpoint_spy: {
+    prompt: "Elite corporate intelligence agent, sharp tailored navy business suit, subtle earpiece, background split between glowing identity vault access panels and dark city skyline, SailPoint teal and navy color scheme, professional cinematic photography, ultra realistic, 8K",
+    negative: "cartoon, anime, deformed, blurry, bad anatomy, watermark",
+  },
 };
 
 export default async function handler(req, res) {
-  // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const { imageBase64, style = "james_bond" } = req.body;
-
+  const { imageBase64, style = "james_bond", firstName = "", lastName = "" } = req.body;
   if (!imageBase64) return res.status(400).json({ error: "No image provided" });
-  if (!process.env.REPLICATE_API_TOKEN) return res.status(500).json({ error: "API token not configured" });
+  if (!process.env.REPLICATE_API_TOKEN) return res.status(500).json({ error: "REPLICATE_API_TOKEN not set" });
+
+  const s = STYLES[style] || STYLES.james_bond;
+
+  // Add name to prompt if provided
+  const nameTag = [firstName, lastName].filter(Boolean).join(" ");
+  const finalPrompt = nameTag
+    ? `${s.prompt}. Agent name tag on chest reads "${nameTag}"`
+    : s.prompt;
 
   try {
     const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
 
-    const stylePrompt = STYLE_PROMPTS[style] || STYLE_PROMPTS.james_bond;
-
-    // Use FLUX with image-to-image (img2img) via fofr/flux-style-transfer or similar
+    // InstantID: preserves facial identity from the input photo
     const output = await replicate.run(
-      "black-forest-labs/flux-1.1-pro",
+      "zsxkib/instant-id:491ddf5be6b827f8931f088ef10c6d8d0222f41a849bebb08e67b5061e86fd7a",
       {
         input: {
-          prompt: `Portrait photo of a person. ${stylePrompt} The person's face and likeness from the reference photo must be preserved as accurately as possible. Same person, same facial features, same hair.`,
           image: `data:image/jpeg;base64,${imageBase64}`,
-          prompt_strength: 0.75,
-          aspect_ratio: "9:16",
-          output_format: "jpg",
-          output_quality: 90,
-          safety_tolerance: 2
-        }
+          prompt: finalPrompt,
+          negative_prompt: s.negative,
+          ip_adapter_scale: 0.8,
+          controlnet_conditioning_scale: 0.8,
+          num_inference_steps: 30,
+          guidance_scale: 5,
+          width: 640,
+          height: 960,
+        },
       }
     );
 
-    // output is a URL string
     const imageUrl = Array.isArray(output) ? output[0] : output;
-    return res.status(200).json({ imageUrl });
+    return res.status(200).json({ imageUrl: String(imageUrl) });
 
   } catch (err) {
-    console.error("Replicate error:", err);
+    console.error("Replicate error:", err.message);
     return res.status(500).json({ error: err.message || "Error generating image" });
   }
 }

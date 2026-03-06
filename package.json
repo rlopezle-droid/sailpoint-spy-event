@@ -1,7 +1,6 @@
 {
   "name": "sailpoint-spy-event",
-  "version": "2.0.0",
-  "description": "SailPoint Adaptive Identity Spy Event App",
+  "version": "5.0.0",
   "dependencies": {
     "replicate": "^0.31.0"
   }
