@@ -335,6 +335,20 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       </div>
     </div>
 
+    <div style="margin-top:16px">
+      <span class="sec-lbl">// GÉNERO DEL AGENTE</span>
+      <div style="display:flex;gap:10px">
+        <div class="style-card sel" id="g-male" onclick="setGender('male')" style="flex:1;text-align:center;padding:12px">
+          <span class="s-icon">👨</span>
+          <div class="s-name">MASCULINO</div>
+        </div>
+        <div class="style-card" id="g-female" onclick="setGender('female')" style="flex:1;text-align:center;padding:12px">
+          <span class="s-icon">👩</span>
+          <div class="s-name">FEMENINO</div>
+        </div>
+      </div>
+    </div>
+
     <div class="btn-row mt" style="margin-top:18px">
       <button class="btn btn-s" id="btn-back-mision">← VOLVER</button>
       <button class="btn btn-p" id="btn-go" style="flex:2">🕵️ GENERAR IDENTIDAD</button>
@@ -388,6 +402,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 // ── STATE ──────────────────────────────────────────────
 let photoB64 = null;
 let selectedStyle = 'james_bond';
+let selectedGender = 'male';
 let mediaStream = null;
 let agentId = '';
 let consentGiven = false;
@@ -513,6 +528,12 @@ document.getElementById('btn-next-foto').addEventListener('click',()=>{
   if(!photoB64)return showErr('err-foto','Primero captura o sube tu foto.');
   showErr('err-foto','');showScr('scr-mision',3);
 });
+function setGender(g){
+  selectedGender = g;
+  document.getElementById('g-male').classList.toggle('sel', g==='male');
+  document.getElementById('g-female').classList.toggle('sel', g==='female');
+}
+
 document.getElementById('btn-back-mision').addEventListener('click',()=>showScr('scr-foto',2));
 
 // ── STYLE CARDS ────────────────────────────────────────
@@ -568,7 +589,7 @@ document.getElementById('btn-go').addEventListener('click',async()=>{
     const res=await fetch('/api/generate',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({imageBase64:photoB64,style:selectedStyle,firstName:nombre,lastName:apellido})
+      body:JSON.stringify({imageBase64:photoB64,style:selectedStyle,firstName:nombre,lastName:apellido,gender:selectedGender})
     });
     const data=await res.json();
     if(!res.ok)throw new Error(data.error||'Error desconocido');
