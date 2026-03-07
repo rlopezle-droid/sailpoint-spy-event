@@ -15,33 +15,38 @@
 
   <style>
     /* =========================================================
-       TOKENS / PALETA
+       TOKENS / PALETA — SAILPOINT-LIKE
+       Mantengo el fondo dark navy y adapto botones / acentos
        ========================================================= */
     :root {
       --navy: #0A1628;
       --navy2: #0D1F3C;
-      --teal: #00C4B4;
-      --teal-dk: #009688;
       --white: #FFFFFF;
-      --gray: #8FA3B1;
+      --gray: #9FB0C3;
       --red: #FF3B3B;
 
-      /* Variantes alpha del color acento */
-      --teal-015: rgba(0, 196, 180, 0.015);
-      --teal-03: rgba(0, 196, 180, 0.03);
-      --teal-08: rgba(0, 196, 180, 0.08);
-      --teal-10: rgba(0, 196, 180, 0.10);
-      --teal-12: rgba(0, 196, 180, 0.12);
-      --teal-18: rgba(0, 196, 180, 0.18);
-      --teal-22: rgba(0, 196, 180, 0.22);
-      --teal-25: rgba(0, 196, 180, 0.25);
-      --teal-35: rgba(0, 196, 180, 0.35);
-      --teal-40: rgba(0, 196, 180, 0.40);
-      --teal-50: rgba(0, 196, 180, 0.50);
-      --teal-70: rgba(0, 196, 180, 0.70);
+      /* Accent principal más cercano a SailPoint */
+      --accent: #38BDF8;
+      --accent-strong: #0EA5E9;
+      --accent-deep: #0284C7;
+      --accent-soft: #7DD3FC;
 
-      --border: var(--teal-25);
-      --teal-gl: var(--teal-12);
+      /* Variantes alpha del accent */
+      --accent-015: rgba(56, 189, 248, 0.015);
+      --accent-03: rgba(56, 189, 248, 0.03);
+      --accent-08: rgba(56, 189, 248, 0.08);
+      --accent-10: rgba(56, 189, 248, 0.10);
+      --accent-12: rgba(56, 189, 248, 0.12);
+      --accent-18: rgba(56, 189, 248, 0.18);
+      --accent-22: rgba(56, 189, 248, 0.22);
+      --accent-25: rgba(56, 189, 248, 0.25);
+      --accent-35: rgba(56, 189, 248, 0.35);
+      --accent-40: rgba(56, 189, 248, 0.40);
+      --accent-50: rgba(56, 189, 248, 0.50);
+      --accent-70: rgba(56, 189, 248, 0.70);
+
+      --border: var(--accent-25);
+      --accent-gl: var(--accent-12);
     }
 
     /* =========================================================
@@ -79,8 +84,8 @@
           0deg,
           transparent,
           transparent 2px,
-          var(--teal-015) 2px,
-          var(--teal-015) 4px
+          var(--accent-015) 2px,
+          var(--accent-015) 4px
         );
     }
 
@@ -91,8 +96,8 @@
       pointer-events: none;
       z-index: 0;
       background-image:
-        linear-gradient(var(--teal-03) 1px, transparent 1px),
-        linear-gradient(90deg, var(--teal-03) 1px, transparent 1px);
+        linear-gradient(var(--accent-03) 1px, transparent 1px),
+        linear-gradient(90deg, var(--accent-03) 1px, transparent 1px);
       background-size: 44px 44px;
     }
 
@@ -100,7 +105,7 @@
       position: fixed;
       width: 48px;
       height: 48px;
-      border-color: var(--teal);
+      border-color: var(--accent);
       border-style: solid;
       opacity: 0.28;
       z-index: 100;
@@ -146,7 +151,7 @@
       font-family: 'Share Tech Mono', monospace;
       font-size: 10px;
       letter-spacing: 4px;
-      color: var(--teal);
+      color: var(--accent);
       border: 1px solid var(--border);
       padding: 4px 14px;
       margin-bottom: 14px;
@@ -156,10 +161,10 @@
     @keyframes blink {
       0%,
       100% {
-        border-color: var(--teal-25);
+        border-color: var(--accent-25);
       }
       50% {
-        border-color: var(--teal-70);
+        border-color: var(--accent-70);
       }
     }
 
@@ -174,7 +179,7 @@
     .hex {
       width: 32px;
       height: 32px;
-      background: var(--teal);
+      background: var(--accent);
       flex-shrink: 0;
       clip-path: polygon(
         50% 0%,
@@ -218,7 +223,7 @@
     }
 
     .op-title span {
-      color: var(--teal);
+      color: var(--accent);
       display: block;
     }
 
@@ -234,7 +239,7 @@
       width: 70%;
       max-width: 260px;
       height: 1px;
-      background: linear-gradient(90deg, transparent, var(--teal), transparent);
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
       margin: 16px auto;
       position: relative;
       z-index: 10;
@@ -275,24 +280,24 @@
       width: 30px;
       height: 30px;
       border-radius: 50%;
-      border: 1.5px solid var(--teal);
+      border: 1.5px solid var(--accent);
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: 'Share Tech Mono', monospace;
       font-size: 10px;
-      color: var(--teal);
+      color: var(--accent);
       transition: all 0.4s;
     }
 
     .step.active .step-n {
-      background: var(--teal);
+      background: var(--accent);
       color: var(--navy);
-      box-shadow: 0 0 14px var(--teal-50);
+      box-shadow: 0 0 14px var(--accent-50);
     }
 
     .step.done .step-n {
-      background: var(--teal-18);
+      background: var(--accent-18);
     }
 
     .step-lbl {
@@ -349,7 +354,7 @@
     .brief {
       background: rgba(13, 31, 60, 0.85);
       border: 1px solid var(--border);
-      border-left: 3px solid var(--teal);
+      border-left: 3px solid var(--accent);
       padding: 13px 15px;
       margin-bottom: 20px;
     }
@@ -358,7 +363,7 @@
       content: '// MISSION BRIEFING';
       font-family: 'Share Tech Mono', monospace;
       font-size: 9px;
-      color: var(--teal);
+      color: var(--accent);
       letter-spacing: 2px;
       display: block;
       margin-bottom: 7px;
@@ -371,7 +376,7 @@
     }
 
     .brief strong {
-      color: var(--teal);
+      color: var(--accent);
     }
 
     /* =========================================================
@@ -380,7 +385,7 @@
     .sec-lbl {
       font-family: 'Share Tech Mono', monospace;
       font-size: 9px;
-      color: var(--teal);
+      color: var(--accent);
       letter-spacing: 2px;
       display: block;
       margin-bottom: 8px;
@@ -419,17 +424,17 @@
       font-size: 13px;
       width: 100%;
       outline: none;
-      transition: border-color 0.25s;
+      transition: border-color 0.25s, box-shadow 0.25s;
       border-radius: 2px;
     }
 
     .field:focus {
-      border-color: var(--teal);
-      box-shadow: 0 0 8px var(--teal-12);
+      border-color: var(--accent);
+      box-shadow: 0 0 8px var(--accent-12);
     }
 
     .field::placeholder {
-      color: rgba(143, 163, 177, 0.35);
+      color: rgba(159, 176, 195, 0.35);
     }
 
     /* =========================================================
@@ -455,24 +460,24 @@
     }
 
     .btn-p {
-      background: var(--teal);
-      color: var(--navy);
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #06111F;
     }
 
     .btn-p:hover:not(:disabled) {
-      background: var(--teal);
-      box-shadow: 0 0 18px var(--teal-35);
+      background: linear-gradient(135deg, var(--accent-soft), var(--accent));
+      box-shadow: 0 0 18px var(--accent-35);
       transform: translateY(-1px);
     }
 
     .btn-s {
       background: transparent;
-      color: var(--teal);
-      border: 1px solid var(--teal);
+      color: var(--accent);
+      border: 1px solid var(--accent);
     }
 
     .btn-s:hover:not(:disabled) {
-      background: var(--teal-gl);
+      background: var(--accent-gl);
     }
 
     .btn:disabled {
@@ -508,7 +513,7 @@
     }
 
     .capture-zone:hover {
-      border-color: var(--teal-50);
+      border-color: var(--accent-50);
       background: rgba(13, 31, 60, 0.7);
     }
 
@@ -548,7 +553,7 @@
     .preview-frame {
       position: absolute;
       inset: 0;
-      border: 2px solid var(--teal);
+      border: 2px solid var(--accent);
       pointer-events: none;
     }
 
@@ -561,7 +566,7 @@
       padding: 6px 10px;
       font-family: 'Share Tech Mono', monospace;
       font-size: 9px;
-      color: var(--teal);
+      color: var(--accent);
       letter-spacing: 2px;
     }
 
@@ -590,7 +595,7 @@
       position: absolute;
       width: 16px;
       height: 16px;
-      border-color: var(--teal);
+      border-color: var(--accent);
       border-style: solid;
     }
 
@@ -625,7 +630,7 @@
       transform: translate(-50%, -50%);
       width: 52px;
       height: 52px;
-      border: 1px solid var(--teal-40);
+      border: 1px solid var(--accent-40);
       border-radius: 50%;
     }
 
@@ -636,7 +641,7 @@
       transform: translateX(-50%);
       font-family: 'Share Tech Mono', monospace;
       font-size: 9px;
-      color: var(--teal);
+      color: var(--accent);
       letter-spacing: 2px;
       white-space: nowrap;
     }
@@ -661,13 +666,13 @@
     }
 
     .card:hover {
-      border-color: var(--teal-50);
+      border-color: var(--accent-50);
       background: rgba(13, 31, 60, 0.8);
     }
 
     .card.sel {
-      border-color: var(--teal);
-      background: var(--teal-08);
+      border-color: var(--accent);
+      background: var(--accent-08);
     }
 
     .card.sel::after {
@@ -675,7 +680,7 @@
       position: absolute;
       top: 7px;
       right: 9px;
-      color: var(--teal);
+      color: var(--accent);
       font-size: 11px;
       font-weight: bold;
     }
@@ -722,12 +727,12 @@
     }
 
     .gender-card:hover {
-      border-color: var(--teal-50);
+      border-color: var(--accent-50);
     }
 
     .gender-card.sel {
-      border-color: var(--teal);
-      background: var(--teal-08);
+      border-color: var(--accent);
+      background: var(--accent-08);
     }
 
     .gender-card.sel::after {
@@ -735,7 +740,7 @@
       position: absolute;
       top: 7px;
       right: 9px;
-      color: var(--teal);
+      color: var(--accent);
       font-size: 11px;
       font-weight: bold;
     }
@@ -767,7 +772,7 @@
       content: '// PROTECCIÓN DE DATOS — RGPD';
       font-family: 'Share Tech Mono', monospace;
       font-size: 9px;
-      color: var(--teal);
+      color: var(--accent);
       letter-spacing: 2px;
       display: block;
       margin-bottom: 10px;
@@ -785,7 +790,7 @@
     }
 
     .gdpr-text a {
-      color: var(--teal);
+      color: var(--accent);
       text-decoration: none;
     }
 
@@ -800,7 +805,7 @@
     .consent-check {
       width: 18px;
       height: 18px;
-      border: 1.5px solid var(--teal);
+      border: 1.5px solid var(--accent);
       background: transparent;
       flex-shrink: 0;
       margin-top: 1px;
@@ -812,7 +817,7 @@
     }
 
     .consent-check.checked {
-      background: var(--teal);
+      background: var(--accent);
     }
 
     .consent-check.checked::after {
@@ -870,7 +875,7 @@
       width: 140px;
       height: 140px;
       border-radius: 50%;
-      border: 2px solid var(--teal-22);
+      border: 2px solid var(--accent-22);
       margin: 0 auto 28px;
       position: relative;
       display: flex;
@@ -883,7 +888,7 @@
       content: '';
       position: absolute;
       border-radius: 50%;
-      border: 1px solid var(--teal-12);
+      border: 1px solid var(--accent-12);
     }
 
     .radar::before {
@@ -900,7 +905,7 @@
       position: absolute;
       inset: 0;
       border-radius: 50%;
-      background: conic-gradient(from 0deg, var(--teal-40) 0deg, transparent 90deg);
+      background: conic-gradient(from 0deg, var(--accent-40) 0deg, transparent 90deg);
       animation: rot 2s linear infinite;
     }
 
@@ -913,9 +918,9 @@
     .rdot {
       width: 6px;
       height: 6px;
-      background: var(--teal);
+      background: var(--accent);
       border-radius: 50%;
-      box-shadow: 0 0 8px var(--teal);
+      box-shadow: 0 0 8px var(--accent);
       position: relative;
       z-index: 2;
     }
@@ -930,7 +935,7 @@
     .proc-log {
       font-family: 'Share Tech Mono', monospace;
       font-size: 11px;
-      color: var(--teal);
+      color: var(--accent);
       min-height: 18px;
       letter-spacing: 1px;
     }
@@ -945,16 +950,16 @@
 
     .prog {
       height: 100%;
-      background: linear-gradient(90deg, var(--teal-dk), var(--teal));
+      background: linear-gradient(90deg, var(--accent-deep), var(--accent));
       width: 0%;
       transition: width 0.6s ease;
-      box-shadow: 0 0 6px var(--teal);
+      box-shadow: 0 0 6px var(--accent);
     }
 
     .proc-note {
       font-family: 'Share Tech Mono', monospace;
       font-size: 10px;
-      color: rgba(143, 163, 177, 0.45);
+      color: rgba(159, 176, 195, 0.45);
       margin-top: 10px;
       line-height: 1.6;
     }
@@ -969,11 +974,11 @@
 
     .r-badge {
       display: inline-block;
-      background: var(--teal-10);
-      border: 1px solid var(--teal);
+      background: var(--accent-10);
+      border: 1px solid var(--accent);
       font-family: 'Share Tech Mono', monospace;
       font-size: 10px;
-      color: var(--teal);
+      color: var(--accent);
       letter-spacing: 3px;
       padding: 4px 14px;
       margin-bottom: 12px;
@@ -1004,7 +1009,7 @@
     #result-img {
       width: 100%;
       display: block;
-      border: 2px solid var(--teal);
+      border: 2px solid var(--accent);
     }
 
     .r-overlay {
@@ -1023,7 +1028,7 @@
       font-family: 'Oswald', sans-serif;
       font-size: 13px;
       letter-spacing: 2px;
-      color: var(--teal);
+      color: var(--accent);
       display: block;
     }
 
@@ -1036,7 +1041,7 @@
     .ro-r {
       font-family: 'Share Tech Mono', monospace;
       font-size: 10px;
-      color: var(--teal);
+      color: var(--accent);
       opacity: 0.6;
     }
 
@@ -1056,7 +1061,7 @@
       padding: 0 20px 24px;
       font-family: 'Share Tech Mono', monospace;
       font-size: 9px;
-      color: rgba(143, 163, 177, 0.3);
+      color: rgba(159, 176, 195, 0.3);
       letter-spacing: 1px;
     }
 
@@ -1064,7 +1069,7 @@
       position: fixed;
       width: 2px;
       height: 2px;
-      background: var(--teal);
+      background: var(--accent);
       border-radius: 50%;
       pointer-events: none;
       animation: fup linear infinite;
@@ -1252,7 +1257,7 @@
           portabilidad y oposición. Escríbanos a
           <a href="mailto:privacy@sailpoint.com">privacy@sailpoint.com</a>.
           Puede reclamar ante la AEPD:
-          <a href="https://www.aepd.es" target="_blank">aepd.es</a>.
+          <a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer">aepd.es</a>.
           <br><br>
 
           <strong>Transferencias internacionales:</strong> Sus datos podrán transferirse
@@ -1393,7 +1398,7 @@
 
         <div class="proc-title">
           PROCESANDO
-          <span style="color: var(--teal);" class="dots"></span>
+          <span style="color: var(--accent);" class="dots"></span>
         </div>
 
         <div class="prog-wrap">
