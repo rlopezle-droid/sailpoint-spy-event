@@ -60,7 +60,7 @@ export default async function handler(req, res) {
   const { imageBase64, style = "james_bond", gender = "male" } = req.body;
   if (!imageBase64) return res.status(400).json({ error: "No image provided" });
   if (!process.env.REPLICATE_API_TOKEN) return res.status(500).json({ error: "REPLICATE_API_TOKEN not set" });
-  if (!process.env.SEGMIND_API_KEY) return res.status(500).json({ error: "SEGMIND_API_KEY not set in Vercel environment variables" });
+  if (!process.env.SEGMIND_API_KEY) return res.status(500).json({ error: "SEGMIND_API_KEY not set in Vercel" });
 
   const s = STYLES[style] || STYLES.james_bond;
   const genderKey = gender === "female" ? "female" : "male";
@@ -84,6 +84,8 @@ export default async function handler(req, res) {
     await sleep(12000);
 
     // ── STEP 2: Segmind FaceSwap v4 ──────────────────────────────────
+    // Segmind always returns raw binary image (JPEG bytes), regardless of base64 param.
+    // We read the response as ArrayBuffer and convert to base64 ourselves.
     console.log("Step 2: Segmind FaceSwap v4...");
     const sceneBase64 = await urlToBase64(sceneUrl);
 
@@ -94,49 +96,38 @@ export default async function handler(req, res) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        source_image: imageBase64,  // user's face
-        target_image: sceneBase64,  // spy scene
+        source_image: imageBase64,
+        target_image: sceneBase64,
         model_type: "quality",
-        swap_type: "head",          // preserves hair from source photo
+        swap_type: "head",
         style_type: "normal",
         seed: 42,
         image_format: "jpg",
         image_quality: 95,
-        base64: false,              // returns JSON with image_url field
       }),
     });
 
-    // Always read as text first to safely handle non-JSON error responses
-    const rawText = await segmindRes.text();
+    // Check content-type to decide how to handle response
+    const contentType = segmindRes.headers.get("content-type") || "";
+    console.log(`Segmind response: ${segmindRes.status} / ${contentType}`);
 
     if (!segmindRes.ok) {
-      console.error("Segmind raw error:", rawText);
-      // Give a clear actionable message depending on status
+      const errText = await segmindRes.text();
       if (segmindRes.status === 401 || segmindRes.status === 403) {
         throw new Error("Segmind API key inválida. Verifica SEGMIND_API_KEY en Vercel.");
       }
       if (segmindRes.status === 402) {
         throw new Error("Sin créditos en Segmind. Recarga en segmind.com/dashboard.");
       }
-      throw new Error(`Segmind error ${segmindRes.status}: ${rawText.slice(0, 200)}`);
+      throw new Error(`Segmind error ${segmindRes.status}: ${errText.slice(0, 300)}`);
     }
 
-    // Parse JSON response
-    let segmindData;
-    try {
-      segmindData = JSON.parse(rawText);
-    } catch {
-      throw new Error(`Segmind respuesta inválida: ${rawText.slice(0, 200)}`);
-    }
+    // Segmind returns raw binary JPEG — read as ArrayBuffer and encode to base64
+    const imageBuffer = await segmindRes.arrayBuffer();
+    const resultBase64 = Buffer.from(imageBuffer).toString("base64");
+    const imageUrl = `data:image/jpeg;base64,${resultBase64}`;
 
-    // Segmind v4 with base64:false returns { image_url: "https://..." }
-    const imageUrl = segmindData.image_url || segmindData.output || segmindData.url;
-    if (!imageUrl) {
-      console.error("Segmind response keys:", Object.keys(segmindData));
-      throw new Error("Segmind no devolvió imagen. Respuesta: " + JSON.stringify(segmindData).slice(0, 200));
-    }
-
-    console.log("Step 2 done:", imageUrl);
+    console.log("Step 2 done. Image size:", imageBuffer.byteLength, "bytes");
     return res.status(200).json({ imageUrl });
 
   } catch (err) {
