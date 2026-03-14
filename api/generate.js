@@ -1,28 +1,23 @@
 const Replicate = require("replicate");
 
-// Single-call pipeline using FLUX 1.1 Pro Ultra with image reference.
-// The user's photo is passed as the input image, and the style prompt
-// guides the restyling. No face-swap model = no NSFW false positives.
+// image_prompt_strength: 0.15 = strongly preserves the input photo identity
+// Prompts are gender-neutral — "The same person" lets the model use the photo's gender
 const STYLES = {
   james_bond: {
-    male:   "The same person wearing an elegant black tuxedo with bow tie, arms confidently crossed, standing against a dramatic night cityscape with blurred neon lights. Cinematic movie poster, chiaroscuro lighting, deep blue and gold tones. Face clearly visible, front-facing, sharp focus. Ultra realistic, 8K, full body portrait.",
-    female: "The same person wearing a sharp tailored black pantsuit with a white blouse, arms confidently crossed, standing against a dramatic night cityscape with blurred neon lights. Cinematic movie poster, chiaroscuro lighting, deep blue and gold tones. Face clearly visible, front-facing, sharp focus. Ultra realistic, 8K, full body portrait.",
-    negative: "cartoon, anime, deformed, blurry, watermark, gun, weapon, pistol, knife, revealing clothes, cleavage, lingerie, sexy, provocative",
+    prompt: "The same person wearing an elegant black tuxedo with bow tie, arms confidently crossed, standing against a dramatic night cityscape with blurred neon lights. Cinematic movie poster, chiaroscuro lighting, deep blue and gold tones. Face clearly visible, front-facing, sharp focus. Ultra realistic, 8K, full body portrait.",
+    negative: "cartoon, anime, deformed, blurry, watermark, gun, weapon, pistol, knife, revealing clothes, cleavage, lingerie, sexy, provocative, gender change, different person",
   },
   mission_impossible: {
-    male:   "The same person wearing a black tactical jacket and trousers with a small earpiece, standing on a glass skyscraper rooftop at night, city lights below, arms crossed. Face clearly visible, front-facing, sharp focus. Orange and teal cinematic color grading. Ultra realistic, 8K, full body portrait.",
-    female: "The same person wearing a black tactical jacket and straight-cut trousers with a small earpiece, standing on a glass skyscraper rooftop at night, city lights below, arms crossed. Face clearly visible, front-facing, sharp focus. Orange and teal cinematic color grading. Ultra realistic, 8K, full body portrait.",
-    negative: "cartoon, anime, deformed, blurry, watermark, gun, weapon, knife, revealing clothes, cleavage, lingerie, sexy, provocative",
+    prompt: "The same person wearing a black tactical jacket and trousers with a small earpiece, standing on a glass skyscraper rooftop at night, city lights below, arms crossed. Face clearly visible, front-facing, sharp focus. Orange and teal cinematic color grading. Ultra realistic, 8K, full body portrait.",
+    negative: "cartoon, anime, deformed, blurry, watermark, gun, weapon, knife, revealing clothes, cleavage, lingerie, sexy, provocative, gender change, different person",
   },
   ai_cyber: {
-    male:   "The same person wearing a futuristic structured holographic jacket with electric teal glowing circuits, standing in a server room with floating holographic data panels, hands on hips. Face clearly visible, front-facing, sharp focus. Deep navy and teal neon glow. Ultra realistic, 8K, half body portrait.",
-    female: "The same person wearing a futuristic structured holographic jacket and wide-leg trousers with electric teal glowing circuits, standing in a server room with floating holographic data panels, hands on hips. Face clearly visible, front-facing, sharp focus. Deep navy and teal neon glow. Ultra realistic, 8K, half body portrait.",
-    negative: "cartoon, anime, deformed, blurry, watermark, gun, weapon, bodysuit, catsuit, revealing clothes, cleavage, lingerie, sexy, provocative",
+    prompt: "The same person wearing a futuristic structured holographic jacket with electric teal glowing circuits, standing in a server room with floating holographic data panels, hands on hips. Face clearly visible, front-facing, sharp focus. Deep navy and teal neon glow. Ultra realistic, 8K, half body portrait.",
+    negative: "cartoon, anime, deformed, blurry, watermark, gun, weapon, bodysuit, catsuit, revealing clothes, cleavage, lingerie, sexy, provocative, gender change, different person",
   },
   sailpoint_spy: {
-    male:   "The same person wearing a sharp tailored navy business suit with a subtle earpiece, arms crossed, standing in front of glowing identity vault panels and a dark city skyline. Face clearly visible, front-facing, sharp focus. Teal and navy color palette, professional cinematic lighting. Ultra realistic, 8K, full body portrait.",
-    female: "The same person wearing a sharp tailored navy business suit with a subtle earpiece, arms crossed, standing in front of glowing identity vault panels and a dark city skyline. Face clearly visible, front-facing, sharp focus. Teal and navy color palette, professional cinematic lighting. Ultra realistic, 8K, full body portrait.",
-    negative: "cartoon, anime, deformed, blurry, watermark, gun, weapon, revealing clothes, cleavage, lingerie, sexy, provocative",
+    prompt: "The same person wearing a sharp tailored navy business suit with a subtle earpiece, arms crossed, standing in front of glowing identity vault panels and a dark city skyline. Face clearly visible, front-facing, sharp focus. Teal and navy color palette, professional cinematic lighting. Ultra realistic, 8K, full body portrait.",
+    negative: "cartoon, anime, deformed, blurry, watermark, gun, weapon, revealing clothes, cleavage, lingerie, sexy, provocative, gender change, different person",
   },
 };
 
@@ -53,27 +48,24 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const { imageBase64, style = "james_bond", gender = "male" } = req.body;
+  const { imageBase64, style = "james_bond" } = req.body;
   if (!imageBase64) return res.status(400).json({ error: "No image provided" });
   if (!process.env.REPLICATE_API_TOKEN) return res.status(500).json({ error: "REPLICATE_API_TOKEN not set" });
 
   const s = STYLES[style] || STYLES.james_bond;
-  const genderKey = gender === "female" ? "female" : "male";
   const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
 
   try {
-    // Single call: FLUX 1.1 Pro Ultra with the user's photo as image reference.
-    // "The same person wearing..." instructs the model to preserve identity.
-    // No second face-swap step = no NSFW false positives.
-    console.log(`Generating with FLUX Ultra — ${style} / ${genderKey}`);
+    console.log(`Generating — ${style}`);
     const output = await runWithRetry(replicate, "black-forest-labs/flux-1.1-pro-ultra", {
-      prompt: s[genderKey],
+      prompt: s.prompt,
+      negative_prompt: s.negative,
       image: `data:image/jpeg;base64,${imageBase64}`,
-      image_prompt_strength: 0.45,   // 0=ignore photo, 1=copy photo. 0.45 = style change but keep identity
+      image_prompt_strength: 0.15,  // low = stay close to photo, preserve gender/face/hair
       aspect_ratio: "2:3",
       output_format: "jpg",
       output_quality: 95,
-      safety_tolerance: 6,           // maximum: avoids NSFW false positives on normal photos
+      safety_tolerance: 6,
       raw: false,
     });
 
@@ -82,7 +74,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ imageUrl });
 
   } catch (err) {
-    console.error("FLUX Ultra error:", err.message);
+    console.error("Error:", err.message);
     return res.status(500).json({ error: err.message || "Error generating image" });
   }
 }
