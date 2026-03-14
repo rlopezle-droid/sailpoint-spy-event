@@ -1,28 +1,28 @@
 const Replicate = require("replicate");
 
-// KEY PRINCIPLE: Do NOT describe body shape, hair, or physical attributes.
-// Let the face-swap model (Ideogram) take those from the real photo.
-// Only describe clothing, setting, pose and lighting.
+// Single-call pipeline using FLUX 1.1 Pro Ultra with image reference.
+// The user's photo is passed as the input image, and the style prompt
+// guides the restyling. No face-swap model = no NSFW false positives.
 const STYLES = {
   james_bond: {
-    male: "A person wearing an elegant black tuxedo with bow tie, arms confidently crossed, standing against a dramatic night cityscape with blurred neon lights. Cinematic movie poster lighting, chiaroscuro, deep blue and gold tones. Face front-facing, neutral expression, sharp focus. Ultra realistic, 8K, full body portrait.",
-    female: "A person wearing a sharp tailored black pantsuit with a white blouse, arms confidently crossed, standing against a dramatic night cityscape with blurred neon lights. Cinematic movie poster lighting, chiaroscuro, deep blue and gold tones. Face front-facing, neutral expression, sharp focus. Ultra realistic, 8K, full body portrait.",
-    negative: "cartoon, anime, deformed, blurry, watermark, sunglasses, hat, mask, gun, weapon, pistol, knife, bad anatomy, revealing clothes, tight clothes, low cut, cleavage, short skirt, dress, gown, lingerie, sexy, provocative, unrealistic body, distorted body, elongated body, thin, skinny, oversized breasts, different hair, hair change",
+    male:   "The same person wearing an elegant black tuxedo with bow tie, arms confidently crossed, standing against a dramatic night cityscape with blurred neon lights. Cinematic movie poster, chiaroscuro lighting, deep blue and gold tones. Face clearly visible, front-facing, sharp focus. Ultra realistic, 8K, full body portrait.",
+    female: "The same person wearing a sharp tailored black pantsuit with a white blouse, arms confidently crossed, standing against a dramatic night cityscape with blurred neon lights. Cinematic movie poster, chiaroscuro lighting, deep blue and gold tones. Face clearly visible, front-facing, sharp focus. Ultra realistic, 8K, full body portrait.",
+    negative: "cartoon, anime, deformed, blurry, watermark, gun, weapon, pistol, knife, revealing clothes, cleavage, lingerie, sexy, provocative",
   },
   mission_impossible: {
-    male: "A person wearing a black tactical jacket and trousers with a small earpiece, standing on a glass skyscraper rooftop at night, city lights below, arms crossed. Face front-facing, neutral expression, sharp focus. Orange and teal cinematic color grading. Ultra realistic, 8K, full body portrait.",
-    female: "A person wearing a black tactical jacket and straight-cut trousers with a small earpiece, standing on a glass skyscraper rooftop at night, city lights below, arms crossed. Face front-facing, neutral expression, sharp focus. Orange and teal cinematic color grading. Ultra realistic, 8K, full body portrait.",
-    negative: "cartoon, anime, deformed, blurry, watermark, helmet, mask, sunglasses, gun, weapon, knife, bad anatomy, revealing clothes, tight clothes, low cut, cleavage, lingerie, sexy, provocative, unrealistic body, distorted body, elongated body, thin, skinny, oversized breasts, different hair, hair change",
+    male:   "The same person wearing a black tactical jacket and trousers with a small earpiece, standing on a glass skyscraper rooftop at night, city lights below, arms crossed. Face clearly visible, front-facing, sharp focus. Orange and teal cinematic color grading. Ultra realistic, 8K, full body portrait.",
+    female: "The same person wearing a black tactical jacket and straight-cut trousers with a small earpiece, standing on a glass skyscraper rooftop at night, city lights below, arms crossed. Face clearly visible, front-facing, sharp focus. Orange and teal cinematic color grading. Ultra realistic, 8K, full body portrait.",
+    negative: "cartoon, anime, deformed, blurry, watermark, gun, weapon, knife, revealing clothes, cleavage, lingerie, sexy, provocative",
   },
   ai_cyber: {
-    male: "A person wearing a futuristic structured holographic jacket with electric teal glowing circuits, standing in a server room with floating holographic data panels. Face front-facing, neutral expression, sharp focus. Deep navy and teal neon glow. Ultra realistic, 8K, half body portrait.",
-    female: "A person wearing a futuristic structured holographic jacket and wide-leg trousers with electric teal glowing circuits, standing in a server room with floating holographic data panels. Face front-facing, neutral expression, sharp focus. Deep navy and teal neon glow. Ultra realistic, 8K, half body portrait.",
-    negative: "cartoon, anime, deformed, blurry, watermark, helmet, mask, visor, gun, weapon, bad anatomy, bodysuit, catsuit, revealing clothes, tight clothes, low cut, cleavage, lingerie, sexy, provocative, unrealistic body, distorted body, elongated body, thin, skinny, oversized breasts, different hair, hair change",
+    male:   "The same person wearing a futuristic structured holographic jacket with electric teal glowing circuits, standing in a server room with floating holographic data panels, hands on hips. Face clearly visible, front-facing, sharp focus. Deep navy and teal neon glow. Ultra realistic, 8K, half body portrait.",
+    female: "The same person wearing a futuristic structured holographic jacket and wide-leg trousers with electric teal glowing circuits, standing in a server room with floating holographic data panels, hands on hips. Face clearly visible, front-facing, sharp focus. Deep navy and teal neon glow. Ultra realistic, 8K, half body portrait.",
+    negative: "cartoon, anime, deformed, blurry, watermark, gun, weapon, bodysuit, catsuit, revealing clothes, cleavage, lingerie, sexy, provocative",
   },
   sailpoint_spy: {
-    male: "A person wearing a sharp tailored navy business suit with a subtle earpiece, arms crossed, standing in front of glowing identity vault panels and a dark city skyline. Face front-facing, neutral expression, sharp focus. Teal and navy color palette, professional cinematic lighting. Ultra realistic, 8K, full body portrait.",
-    female: "A person wearing a sharp tailored navy business suit with a subtle earpiece, arms crossed, standing in front of glowing identity vault panels and a dark city skyline. Face front-facing, neutral expression, sharp focus. Teal and navy color palette, professional cinematic lighting. Ultra realistic, 8K, full body portrait.",
-    negative: "cartoon, anime, deformed, blurry, watermark, sunglasses, casual clothes, gun, weapon, bad anatomy, revealing clothes, tight clothes, low cut, cleavage, lingerie, sexy, provocative, unrealistic body, distorted body, elongated body, thin, skinny, oversized breasts, different hair, hair change",
+    male:   "The same person wearing a sharp tailored navy business suit with a subtle earpiece, arms crossed, standing in front of glowing identity vault panels and a dark city skyline. Face clearly visible, front-facing, sharp focus. Teal and navy color palette, professional cinematic lighting. Ultra realistic, 8K, full body portrait.",
+    female: "The same person wearing a sharp tailored navy business suit with a subtle earpiece, arms crossed, standing in front of glowing identity vault panels and a dark city skyline. Face clearly visible, front-facing, sharp focus. Teal and navy color palette, professional cinematic lighting. Ultra realistic, 8K, full body portrait.",
+    negative: "cartoon, anime, deformed, blurry, watermark, gun, weapon, revealing clothes, cleavage, lingerie, sexy, provocative",
   },
 };
 
@@ -62,32 +62,27 @@ export default async function handler(req, res) {
   const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
 
   try {
-    console.log(`Step 1: FLUX scene — ${style} / ${genderKey}`);
-    const fluxOutput = await runWithRetry(replicate, "black-forest-labs/flux-1.1-pro", {
+    // Single call: FLUX 1.1 Pro Ultra with the user's photo as image reference.
+    // "The same person wearing..." instructs the model to preserve identity.
+    // No second face-swap step = no NSFW false positives.
+    console.log(`Generating with FLUX Ultra — ${style} / ${genderKey}`);
+    const output = await runWithRetry(replicate, "black-forest-labs/flux-1.1-pro-ultra", {
       prompt: s[genderKey],
-      negative_prompt: s.negative,
+      image: `data:image/jpeg;base64,${imageBase64}`,
+      image_prompt_strength: 0.45,   // 0=ignore photo, 1=copy photo. 0.45 = style change but keep identity
       aspect_ratio: "2:3",
       output_format: "jpg",
       output_quality: 95,
-      safety_tolerance: 2,
-      prompt_upsampling: true,
+      safety_tolerance: 6,           // maximum: avoids NSFW false positives on normal photos
+      raw: false,
     });
-    const sceneUrl = String(Array.isArray(fluxOutput) ? fluxOutput[0] : fluxOutput);
-    console.log("Step 1 done:", sceneUrl);
 
-    await sleep(12000);
+    const imageUrl = String(Array.isArray(output) ? output[0] : output);
+    console.log("Done:", imageUrl);
+    return res.status(200).json({ imageUrl });
 
-    console.log("Step 2: face-swap-with-ideogram");
-    const swapOutput = await runWithRetry(replicate, "fofr/face-swap-with-ideogram", {
-      character_image: `data:image/jpeg;base64,${imageBase64}`,
-      target_image: sceneUrl,
-    });
-    const finalUrl = String(Array.isArray(swapOutput) ? swapOutput[0] : swapOutput);
-    console.log("Step 2 done:", finalUrl);
-
-    return res.status(200).json({ imageUrl: finalUrl });
   } catch (err) {
-    console.error("Pipeline error:", err.message);
+    console.error("FLUX Ultra error:", err.message);
     return res.status(500).json({ error: err.message || "Error generating image" });
   }
 }
