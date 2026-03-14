@@ -1,14 +1,5 @@
 const Replicate = require("replicate");
 
-// PIPELINE (identical to the working version):
-// Step 1 — Replicate FLUX 1.1 Pro generates the spy scene
-// Step 2 — Segmind FaceSwap v4 swaps the face (replaces fofr/face-swap-with-ideogram)
-//
-// Why Segmind instead of Ideogram:
-// - No NSFW false positives on normal photos
-// - swap_type "head" preserves hair colour and style from source photo
-// - No gender change — only the face/head is swapped, body stays from scene
-
 const STYLES = {
   james_bond: {
     male:   "A well-dressed man in an elegant black tuxedo with bow tie, arms confidently crossed. Dramatic night cityscape background with blurred neon lights. Cinematic movie poster, chiaroscuro lighting, deep blue and gold. Face clearly visible, front-facing, neutral expression. Ultra realistic, 8K, full body portrait.",
@@ -52,10 +43,9 @@ async function runWithRetry(replicate, model, input, maxRetries = 4) {
   }
 }
 
-// Fetch a URL and return its contents as base64
 async function urlToBase64(url) {
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`Failed to fetch scene image: ${res.status}`);
+  if (!res.ok) throw new Error(`Failed to fetch scene: ${res.status}`);
   const buf = await res.arrayBuffer();
   return Buffer.from(buf).toString("base64");
 }
@@ -70,15 +60,15 @@ export default async function handler(req, res) {
   const { imageBase64, style = "james_bond", gender = "male" } = req.body;
   if (!imageBase64) return res.status(400).json({ error: "No image provided" });
   if (!process.env.REPLICATE_API_TOKEN) return res.status(500).json({ error: "REPLICATE_API_TOKEN not set" });
-  if (!process.env.SEGMIND_API_KEY) return res.status(500).json({ error: "SEGMIND_API_KEY not set" });
+  if (!process.env.SEGMIND_API_KEY) return res.status(500).json({ error: "SEGMIND_API_KEY not set in Vercel environment variables" });
 
   const s = STYLES[style] || STYLES.james_bond;
   const genderKey = gender === "female" ? "female" : "male";
   const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
 
   try {
-    // ── STEP 1: FLUX generates the spy scene (same as before) ─────────
-    console.log(`Step 1: FLUX scene — ${style} / ${genderKey}`);
+    // ── STEP 1: FLUX generates the spy scene ─────────────────────────
+    console.log(`Step 1: FLUX — ${style} / ${genderKey}`);
     const fluxOutput = await runWithRetry(replicate, "black-forest-labs/flux-1.1-pro", {
       prompt: s[genderKey],
       negative_prompt: s.negative,
@@ -91,16 +81,10 @@ export default async function handler(req, res) {
     const sceneUrl = String(Array.isArray(fluxOutput) ? fluxOutput[0] : fluxOutput);
     console.log("Step 1 done:", sceneUrl);
 
-    // Wait between calls to avoid burst rate limit on Replicate
     await sleep(12000);
 
-    // ── STEP 2: Segmind FaceSwap v4 (replaces fofr/face-swap-with-ideogram) ──
-    // source_image = user's photo (the face to use)
-    // target_image = FLUX spy scene (where the face goes)
-    // swap_type "head" = preserves hair colour/style from the source photo
-    // model_type "quality" = best results, slightly slower than "speed"
+    // ── STEP 2: Segmind FaceSwap v4 ──────────────────────────────────
     console.log("Step 2: Segmind FaceSwap v4...");
-
     const sceneBase64 = await urlToBase64(sceneUrl);
 
     const segmindRes = await fetch("https://api.segmind.com/v1/faceswap-v4", {
@@ -110,28 +94,49 @@ export default async function handler(req, res) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        source_image: imageBase64,   // user's photo — face to insert
-        target_image: sceneBase64,   // spy scene — where to insert it
-        model_type: "quality",       // "quality" or "speed"
-        swap_type: "head",           // "head" preserves hair; "face" only swaps face
+        source_image: imageBase64,  // user's face
+        target_image: sceneBase64,  // spy scene
+        model_type: "quality",
+        swap_type: "head",          // preserves hair from source photo
         style_type: "normal",
+        seed: 42,
         image_format: "jpg",
         image_quality: 95,
-        base64: true,                // return base64 directly, no extra fetch needed
+        base64: false,              // returns JSON with image_url field
       }),
     });
 
+    // Always read as text first to safely handle non-JSON error responses
+    const rawText = await segmindRes.text();
+
     if (!segmindRes.ok) {
-      const errText = await segmindRes.text();
-      throw new Error(`Segmind error (${segmindRes.status}): ${errText}`);
+      console.error("Segmind raw error:", rawText);
+      // Give a clear actionable message depending on status
+      if (segmindRes.status === 401 || segmindRes.status === 403) {
+        throw new Error("Segmind API key inválida. Verifica SEGMIND_API_KEY en Vercel.");
+      }
+      if (segmindRes.status === 402) {
+        throw new Error("Sin créditos en Segmind. Recarga en segmind.com/dashboard.");
+      }
+      throw new Error(`Segmind error ${segmindRes.status}: ${rawText.slice(0, 200)}`);
     }
 
-    // Segmind returns the image as raw binary when base64:true is set
-    const buffer = await segmindRes.arrayBuffer();
-    const resultBase64 = Buffer.from(buffer).toString("base64");
-    const imageUrl = `data:image/jpeg;base64,${resultBase64}`;
+    // Parse JSON response
+    let segmindData;
+    try {
+      segmindData = JSON.parse(rawText);
+    } catch {
+      throw new Error(`Segmind respuesta inválida: ${rawText.slice(0, 200)}`);
+    }
 
-    console.log("Step 2 done.");
+    // Segmind v4 with base64:false returns { image_url: "https://..." }
+    const imageUrl = segmindData.image_url || segmindData.output || segmindData.url;
+    if (!imageUrl) {
+      console.error("Segmind response keys:", Object.keys(segmindData));
+      throw new Error("Segmind no devolvió imagen. Respuesta: " + JSON.stringify(segmindData).slice(0, 200));
+    }
+
+    console.log("Step 2 done:", imageUrl);
     return res.status(200).json({ imageUrl });
 
   } catch (err) {
